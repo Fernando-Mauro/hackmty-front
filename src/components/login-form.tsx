@@ -35,14 +35,14 @@ export default function LoginForm() {
     setIsLoading(true)
 
     try {
-      // 1) Obtener CSRF cookie (si aplica)
-      const csrfRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sanctum/csrf-cookie`, {
-        method: "GET",
-        credentials: "include",
-      })
-      if (!csrfRes.ok) {
-        throw new Error("No se pudo obtener CSRF cookie")
-      }
+      // // 1) Obtener CSRF cookie (si aplica)
+      // const csrfRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sanctum/csrf-cookie`, {
+      //   method: "GET",
+      //   credentials: "include",
+      // })
+      // if (!csrfRes.ok) {
+      //   throw new Error("No se pudo obtener CSRF cookie")
+      // }
 
       // 2) Login
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
@@ -253,7 +253,7 @@ export default function LoginForm() {
               className="w-full transform text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ backgroundColor: "var(--brand-blue)" }}
             >
-              {isLoading ? "Iniciando sesión..." : "Sign In"}
+              {isLoading ? "Login..." : "Sign In"}
             </Button>
 
             <div className="relative">
