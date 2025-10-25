@@ -124,7 +124,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+  @apply bg-background text-foreground;
+  margin: 0; /* MapLibre: ocupar 100vh sin márgenes del body */
   }
 }
 
