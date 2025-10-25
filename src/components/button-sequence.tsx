@@ -1,8 +1,7 @@
 "use client";
-import { motion, Variants, AnimatePresence } from "framer-motion"; // 1. Importa AnimatePresence
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BanknoteArrowDown, Percent } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -19,7 +18,7 @@ const itemVariants: Variants = {
         opacity: 0,
         x: 50,
         transition: {
-            duration: 0.3, // 2. Animación más rápida
+            duration: 0.3,
             ease: "easeOut",
         },
     },
@@ -27,7 +26,7 @@ const itemVariants: Variants = {
         opacity: 1,
         x: 0,
         transition: {
-            duration: 0.1, // 2. Animación más rápida
+            duration: 0.1,
             ease: "easeOut",
         },
     },
@@ -35,28 +34,31 @@ const itemVariants: Variants = {
 
 export function ButtonSequence({
     isHiddenBadge,
+    onPromotionClick, // <-- Recibe la función
+    onOfferClick,     // <-- Recibe la función
 }: {
     isHiddenBadge: boolean;
+    onPromotionClick: () => void;
+    onOfferClick: () => void;
 }) {
-    const router = useRouter();
     return (
         <AnimatePresence>
             {!isHiddenBadge && (
                 <motion.div
-                    key="button-container" // 4. Añade una key única
+                    key="button-container"
                     className="flex flex-col w-full items-end py-4 gap-1"
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    exit="hidden" // 5. Define la animación de salida
+                    exit="hidden"
                 >
                     <motion.button
                         type="button"
-                        onClick={() => router.push("/promotions")}
+                        onClick={onPromotionClick} // <-- Llama a la función del padre
                         className={cn(
                             "w-auto rounded-full px-5 py-3 text-sm font-semibold",
-                            "bg-[#D22E1E] text-white shadow-lg ring-1 ring-green-700/30",
-                            "hover:bg-green-700 hover:shadow-xl active:scale-[0.98]",
+                            "bg-[#D22E1E] text-white shadow-lg",
+                            "hover:bg-red-700 hover:shadow-xl active:scale-[0.98]",
                             "transition-all duration-300 flex-row flex items-center justify-center gap-2"
                         )}
                         variants={itemVariants}
@@ -67,7 +69,7 @@ export function ButtonSequence({
 
                     <motion.button
                         type="button"
-                        onClick={() => router.push("/post-offer")}
+                        onClick={onOfferClick} // <-- Llama a la función del padre
                         className={cn(
                             "w-auto rounded-full px-5 py-3 text-sm font-medium",
                             "bg-[#004878] text-white shadow-md",

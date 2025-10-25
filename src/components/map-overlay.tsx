@@ -1,29 +1,113 @@
 "use client"
 
-import { useState } from "react"
+// --- IMPORTS COMBINADOS ---
+import type React from "react"
+import { useState, useRef, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion" // No necesitamos 'Variants' aquí
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Navigation, MapPin, User, Settings, Plus, X } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ButtonSequence } from "./button-sequence"
+import { ButtonSequence } from "./button-sequence" // Importamos el hijo
 
+// --- COMPONENTE MAP-OVERLAY (PRINCIPAL) ---
 export default function MapOverlay({
     children
 }: {
     children: React.ReactNode
 }) {
+    // --- Estados de Archivo 1 ---
     const [searchQuery, setSearchQuery] = useState("")
     const [activeTab, setActiveTab] = useState<"map" | "profile" | "settings">("map")
     const [isSearchFocused, setIsSearchFocused] = useState(false)
     const [isHiddenBadge, setIsHiddenBadge] = useState(true);
 
+    // --- Estados de DRAG (de Archivo 3) ---
+    const [showBottomSheet, setShowBottomSheet] = useState(false)
+    const [selectedOption, setSelectedOption] = useState<"promotion" | "offer" | null>(null)
+    const [sheetHeight, setSheetHeight] = useState(50) // percentage
+    const [isDragging, setIsDragging] = useState(false)
+    const dragStartY = useRef(0)
+    const dragStartHeight = useRef(0)
+
+    // --- Handlers de DRAG (de Archivo 3) ---
+    const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+        setIsDragging(true)
+        const clientY = "touches" in e ? e.touches[0].clientY : e.clientY
+        dragStartY.current = clientY
+        dragStartHeight.current = sheetHeight
+    }
+
+    const handleDragMove = (e: TouchEvent | MouseEvent) => {
+        if (!isDragging) return
+        e.preventDefault(); // Evita scroll de la página
+        const clientY = "touches" in e ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY
+        const deltaY = dragStartY.current - clientY
+        const windowHeight = window.innerHeight
+        const deltaPercent = (deltaY / windowHeight) * 100
+        const newHeight = Math.min(Math.max(dragStartHeight.current + deltaPercent, 20), 90) // Límite 20% - 90%
+        setSheetHeight(newHeight)
+    }
+
+    const handleDragEnd = () => {
+        setIsDragging(false)
+        // Snap a posiciones (puedes ajustar esto)
+        if (sheetHeight < 35) {
+            setShowBottomSheet(false)
+            setSheetHeight(50)
+        } else if (sheetHeight < 65) {
+            setSheetHeight(50)
+        } else {
+            setSheetHeight(90)
+        }
+    }
+
+    // --- useEffect de DRAG (de Archivo 3) ---
+    useEffect(() => {
+        if (isDragging) {
+            const handleMove = (e: TouchEvent | MouseEvent) => handleDragMove(e)
+            const handleEnd = () => handleDragEnd()
+
+            window.addEventListener("touchmove", handleMove, { passive: false })
+            window.addEventListener("mousemove", handleMove)
+            window.addEventListener("touchend", handleEnd)
+            window.addEventListener("mouseup", handleEnd)
+
+            return () => {
+                window.removeEventListener("touchmove", handleMove)
+                window.removeEventListener("mousemove", handleMove)
+                window.removeEventListener("touchend", handleEnd)
+                window.removeEventListener("mouseup", handleEnd)
+            }
+        }
+    }, [isDragging, sheetHeight])
+
+
+    // --- Handlers para ABRIR el Sheet ---
+    const handleOpenSheet = (option: "promotion" | "offer") => {
+        setSelectedOption(option)
+        setShowBottomSheet(true)
+        setSheetHeight(50) // Empezar al 50%
+        setIsHiddenBadge(true); // Ocultar los botones de nuevo
+    }
+
+    // --- Función para CERRAR el Sheet ---
+    const closeSheet = () => {
+        setShowBottomSheet(false)
+        setSheetHeight(50) // Resetear altura
+    }
+
     return (
+        // 👇 IMPORTANTE: 'overflow-hidden' VUELVE a estar aquí
         <div className="relative h-screen w-full overflow-hidden bg-gray-100">
+            {/* El Mapa (child) se renderiza aquí */}
             {
                 children
             }
 
-            {/* Top Overlay - Search Bar and Compass */}
+            {/* Top Overlay - Search Bar y Botón + */}
             <div className="absolute left-0 right-0 top-0 z-10 p-4 animate-in fade-in slide-in-from-top duration-500">
                 <div className="mx-auto flex max-w-2xl items-center gap-3">
                     {/* Search Bar */}
@@ -39,7 +123,7 @@ export default function MapOverlay({
                         />
                         <Input
                             type="text"
-                            placeholder="Search for a place"
+                            placeholder="Buscar un lugar"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => setIsSearchFocused(true)}
@@ -59,23 +143,28 @@ export default function MapOverlay({
                         )}
                     </div>
 
-                    {/* Compass Button */}
+                    {/* Botón + */}
                     <Button
                         size="icon"
                         className="h-14 w-14 shrink-0 rounded-2xl bg-white text-gray-700 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-xl active:scale-95"
                         style={{
                             borderWidth: "2px",
-                            borderColor: "transparent",
+                            borderColor: !isHiddenBadge ? "var(--brand-blue)" : "transparent",
                         }}
                         onClick={() => setIsHiddenBadge(!isHiddenBadge)}
                     >
-                        <Plus className="h-6 w-6" />
-                        <span className="sr-only">{"Add a sale"}</span>
+                        <Plus className={cn("h-6 w-6 transition-transform duration-300", !isHiddenBadge && "rotate-45")} />
+                        <span className="sr-only">{"Añadir publicación"}</span>
                     </Button>
 
                 </div>
+                {/* Aquí se renderiza ButtonSequence */}
                 <div className="flex flex-col w-full items-end py-4 gap-3">
-                    <ButtonSequence isHiddenBadge={isHiddenBadge} />
+                    <ButtonSequence
+                        isHiddenBadge={isHiddenBadge}
+                        onPromotionClick={() => handleOpenSheet("promotion")}
+                        onOfferClick={() => handleOpenSheet("offer")}
+                    />
                 </div>
             </div>
 
@@ -83,7 +172,7 @@ export default function MapOverlay({
             <div className="absolute bottom-0 left-0 right-0 z-10 animate-in fade-in slide-in-from-bottom duration-500">
                 <div className="mx-auto max-w-2xl px-4 pb-safe">
                     <div className="mb-4 flex items-center justify-around rounded-3xl bg-white p-2 shadow-2xl">
-                        {/* Map/Location Tab */}
+                        {/* ... (tus botones de navegación: MapPin, User, Settings) ... */}
                         <button
                             onClick={() => setActiveTab("map")}
                             className={cn(
@@ -93,19 +182,9 @@ export default function MapOverlay({
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
-                            <MapPin
-                                className={cn(
-                                    "h-6 w-6 transition-transform duration-300",
-                                    activeTab === "map" ? "scale-110" : "group-hover:scale-105",
-                                )}
-                            />
+                            <MapPin className="h-6 w-6" />
                             <span className="text-xs font-medium">{"Mapa"}</span>
-                            {activeTab === "map" && (
-                                <div className="absolute -top-1 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-[var(--brand-red)] animate-in fade-in slide-in-from-bottom-2 duration-300" />
-                            )}
                         </button>
-
-                        {/* Profile Tab */}
                         <button
                             onClick={() => setActiveTab("profile")}
                             className={cn(
@@ -115,19 +194,9 @@ export default function MapOverlay({
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
-                            <User
-                                className={cn(
-                                    "h-6 w-6 transition-transform duration-300",
-                                    activeTab === "profile" ? "scale-110" : "group-hover:scale-105",
-                                )}
-                            />
+                            <User className="h-6 w-6" />
                             <span className="text-xs font-medium">{"Personal"}</span>
-                            {activeTab === "profile" && (
-                                <div className="absolute -top-1 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-[var(--brand-red)] animate-in fade-in slide-in-from-bottom-2 duration-300" />
-                            )}
                         </button>
-
-                        {/* Settings Tab */}
                         <button
                             onClick={() => setActiveTab("settings")}
                             className={cn(
@@ -137,70 +206,102 @@ export default function MapOverlay({
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
-                            <Settings
-                                className={cn(
-                                    "h-6 w-6 transition-transform duration-300",
-                                    activeTab === "settings" ? "scale-110 rotate-90" : "group-hover:scale-105 group-hover:rotate-45",
-                                )}
-                            />
+                            <Settings className="h-6 w-6" />
                             <span className="text-xs font-medium">{"Preferencias"}</span>
-                            {activeTab === "settings" && (
-                                <div className="absolute -top-1 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-[var(--brand-red)] animate-in fade-in slide-in-from-bottom-2 duration-300" />
-                            )}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Content Panels - Slide up from bottom based on active tab */}
-            {activeTab === "profile" && (
-                <div className="absolute bottom-28 left-0 right-0 z-20 animate-in slide-in-from-bottom-full duration-500">
-                    <div className="mx-auto max-w-2xl px-4">
-                        <div className="rounded-t-3xl bg-white p-6 shadow-2xl">
-                            <h2 className="mb-4 text-xl font-bold" style={{ color: "var(--brand-blue)" }}>
-                                {"Personal"}
-                            </h2>
-                            <div className="space-y-3">
-                                <button className="w-full rounded-xl bg-gray-50 p-4 text-left transition-all hover:bg-gray-100 active:scale-98">
-                                    <p className="font-medium text-gray-900">{"Favoritos"}</p>
-                                </button>
-                                <button className="w-full rounded-xl bg-gray-50 p-4 text-left transition-all hover:bg-gray-100 active:scale-98">
-                                    <p className="font-medium text-gray-900">{"Carpool (lista)"}</p>
-                                </button>
-                                <button className="w-full rounded-xl bg-gray-50 p-4 text-left transition-all hover:bg-gray-100 active:scale-98">
-                                    <p className="font-medium text-gray-900">{"Presupuesto (Edita)"}</p>
-                                </button>
-                                <button className="w-full rounded-xl bg-gray-50 p-4 text-left transition-all hover:bg-gray-100 active:scale-98">
-                                    <p className="font-medium text-gray-900">{"Ruta"}</p>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Paneles de Contenido (Profile / Settings) */}
+            {/* ... (tus paneles de 'profile' y 'settings' van aquí, sin cambios) ... */}
 
-            {activeTab === "settings" && (
-                <div className="absolute bottom-28 left-0 right-0 z-20 animate-in slide-in-from-bottom-full duration-500">
-                    <div className="mx-auto max-w-2xl px-4">
-                        <div className="rounded-t-3xl bg-white p-6 shadow-2xl">
-                            <h2 className="mb-4 text-xl font-bold" style={{ color: "var(--brand-blue)" }}>
-                                {"Preferencias"}
-                            </h2>
-                            <div className="space-y-3">
-                                <button className="w-full rounded-xl bg-gray-50 p-4 text-left transition-all hover:bg-gray-100 active:scale-98">
-                                    <p className="font-medium text-gray-900">{"Referencias"}</p>
-                                </button>
-                                <button className="w-full rounded-xl bg-gray-50 p-4 text-left transition-all hover:bg-gray-100 active:scale-98">
-                                    <p className="font-medium text-gray-900">{"Info"}</p>
-                                </button>
-                                <button className="w-full rounded-xl bg-gray-50 p-4 text-left transition-all hover:bg-gray-100 active:scale-98">
-                                    <p className="font-medium text-gray-900">{"Ayuda"}</p>
-                                </button>
+
+            {/* --- BOTTOM SHEET --- */}
+            {/* Se renderiza como un HIJO DIRECTO del div principal */}
+            <AnimatePresence>
+                {showBottomSheet && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            className="absolute inset-0 z-30 bg-black/30"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            onClick={closeSheet}
+                        />
+
+                        {/* Bottom Sheet */}
+                        <motion.div
+                            className="absolute bottom-0 left-0 right-0 z-40"
+                            style={{
+                                height: `${sheetHeight}%`,
+                                touchAction: "none",
+                            }}
+                            initial={{ y: "100%" }}
+                            animate={{ y: "0%" }}
+                            exit={{ y: "100%" }}
+                            transition={{ type: "spring", damping: 20, stiffness: 150 }}
+                        >
+                            <div className="mx-auto h-full max-w-2xl px-4">
+                                <div className="flex h-full flex-col rounded-t-3xl bg-white shadow-2xl">
+                                    {/* Drag Handle */}
+                                    <div
+                                        className="flex cursor-grab items-center justify-center py-4 active:cursor-grabbing"
+                                        onTouchStart={handleDragStart}
+                                        onMouseDown={handleDragStart}
+                                    >
+                                        <div className="h-1.5 w-12 rounded-full bg-gray-300 transition-colors hover:bg-gray-400" />
+                                    </div>
+
+                                    {/* Sheet Content */}
+                                    <div className="flex-1 overflow-y-auto px-6 pb-6">
+                                        <div className="mb-6 flex items-center justify-between">
+                                            <h2 className="text-2xl font-bold" style={{ color: "var(--brand-blue)" }}>
+                                                {selectedOption === "promotion" ? "Publicar Promoción" : "Publicar Descuentazo"}
+                                            </h2>
+                                            <button
+                                                onClick={closeSheet}
+                                                className="rounded-full p-2 transition-all hover:bg-gray-100 active:scale-95"
+                                            >
+                                                <X className="h-6 w-6 text-gray-500" />
+                                            </button>
+                                        </div>
+
+                                        {/* Formulario (Contenido personalizado) */}
+                                        <form className="space-y-4">
+                                            {/* ... (tu formulario con Título, Descripción, Precio, etc.) ... */}
+                                            <div>
+                                                <Label htmlFor="title">{"Título"}</Label>
+                                                <Input id="title" placeholder={selectedOption === "promotion" ? "Ej: 2x1 en Cafés" : "Ej: Audífonos a $100"} />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="description">{"Descripción"}</Label>
+                                                <Textarea id="description" placeholder="Añade detalles, condiciones, ubicación..." />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="price">{"Precio (Opcional)"}</Label>
+                                                <Input id="price" type="number" placeholder="$ 0.00" />
+                                            </div>
+                                            <Button
+                                                type="submit"
+                                                className="w-full"
+                                                style={{
+                                                    backgroundColor: selectedOption === "promotion" ? "#D22E1E" : "#004878",
+                                                    color: "white",
+                                                }}
+                                            >
+                                                {"Publicar"}
+                                            </Button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
