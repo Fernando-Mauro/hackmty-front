@@ -3,17 +3,19 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Navigation, MapPin, User, Settings, X } from "lucide-react"
+import { Search, Navigation, MapPin, User, Settings, Plus, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ButtonSequence } from "./button-sequence"
 
 export default function MapOverlay({
-    children 
+    children
 }: {
     children: React.ReactNode
 }) {
     const [searchQuery, setSearchQuery] = useState("")
     const [activeTab, setActiveTab] = useState<"map" | "profile" | "settings">("map")
     const [isSearchFocused, setIsSearchFocused] = useState(false)
+    const [isHiddenBadge, setIsHiddenBadge] = useState(true);
 
     return (
         <div className="relative h-screen w-full overflow-hidden bg-gray-100">
@@ -37,7 +39,7 @@ export default function MapOverlay({
                         />
                         <Input
                             type="text"
-                            placeholder="Buscar"
+                            placeholder="Search for a place"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => setIsSearchFocused(true)}
@@ -65,10 +67,15 @@ export default function MapOverlay({
                             borderWidth: "2px",
                             borderColor: "transparent",
                         }}
+                        onClick={() => setIsHiddenBadge(!isHiddenBadge)}
                     >
-                        <Navigation className="h-6 w-6" />
-                        <span className="sr-only">{"Brújula"}</span>
+                        <Plus className="h-6 w-6" />
+                        <span className="sr-only">{"Add a sale"}</span>
                     </Button>
+
+                </div>
+                <div className="flex flex-col w-full items-end py-4 gap-3">
+                    <ButtonSequence isHiddenBadge={isHiddenBadge} />
                 </div>
             </div>
 

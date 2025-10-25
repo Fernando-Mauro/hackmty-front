@@ -64,7 +64,7 @@ export default function MapComponent() {
                 onMove={(evt: any) => setInitialViewState(evt.viewState)}
                 style={{ width: "100%", height: "100%" }}
             >
-                <NavigationControl position="top-left" />
+                {/* <NavigationControl position="top-left" /> */}
             </Map>
         </div>
     )

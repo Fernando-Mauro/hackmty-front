@@ -59,7 +59,6 @@ export default function LoginForm() {
         throw new Error("Credenciales inválidas")
       }
 
-      // 3) Extraer token del body o header y guardarlo en cookies
       let data: any = null
       try {
         data = await res.json()
@@ -97,7 +96,7 @@ export default function LoginForm() {
         body: JSON.stringify({ token }),
         headers: { "Content-Type": "application/json" },
       });
-      
+
       setCookie("authToken", token, {
         days: 7,
         // domain: ".tudominio.com", // opcional: ajusta si frontend y api comparten eTLD+1
