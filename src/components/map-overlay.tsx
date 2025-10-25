@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown } from "lucide-react"
+import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown, MessageCircleDashed, FlameKindling, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ButtonSequence } from "./button-sequence" // Importamos el hijo
 
@@ -20,7 +20,7 @@ export default function MapOverlay({
 }) {
     // --- Estados de Archivo 1 ---
     const [searchQuery, setSearchQuery] = useState("")
-    const [activeTab, setActiveTab] = useState<"map" | "profile" | "settings">("map")
+    const [activeTab, setActiveTab] = useState<"map" | "profile" | "meal" | "featured">("map")
     const [isSearchFocused, setIsSearchFocused] = useState(false)
     const [isHiddenBadge, setIsHiddenBadge] = useState(true);
 
@@ -183,7 +183,31 @@ export default function MapOverlay({
                             )}
                         >
                             <MapPin className="h-6 w-6" />
-                            <span className="text-xs font-medium">{"Mapa"}</span>
+                            <span className="text-xs font-medium">{"Map"}</span>
+                        </button>
+                         <button
+                            onClick={() => setActiveTab("meal")}
+                            className={cn(
+                                "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
+                                activeTab === "meal"
+                                    ? "bg-[var(--brand-blue)] text-white shadow-lg"
+                                    : "text-gray-500 hover:bg-gray-50 active:scale-95",
+                            )}
+                        >
+                            <MessageCircleDashed className="h-6 w-6" />
+                            <span className="text-xs font-medium">{"Meal plan"}</span>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("featured")}
+                            className={cn(
+                                "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
+                                activeTab === "featured"
+                                    ? "bg-[var(--brand-blue)] text-white shadow-lg"
+                                    : "text-gray-500 hover:bg-gray-50 active:scale-95",
+                            )}
+                        >
+                            <Flame className="h-6 w-6" />
+                            <span className="text-xs font-medium">{"Featured"}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab("profile")}
@@ -195,20 +219,9 @@ export default function MapOverlay({
                             )}
                         >
                             <User className="h-6 w-6" />
-                            <span className="text-xs font-medium">{"Personal"}</span>
+                            <span className="text-xs font-medium">{"Profile"}</span>
                         </button>
-                        <button
-                            onClick={() => setActiveTab("settings")}
-                            className={cn(
-                                "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
-                                activeTab === "settings"
-                                    ? "bg-[var(--brand-blue)] text-white shadow-lg"
-                                    : "text-gray-500 hover:bg-gray-50 active:scale-95",
-                            )}
-                        >
-                            <Settings className="h-6 w-6" />
-                            <span className="text-xs font-medium">{"Preferencias"}</span>
-                        </button>
+                        
                     </div>
                 </div>
             </div>
