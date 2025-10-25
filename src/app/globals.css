@@ -250,3 +250,55 @@
     opacity: 0;
   }
 } 
+
+.marker-pin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ff4136; /* Rojo */
+  border: 2px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  
+  /* Centra el pin en la coordenada */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1; /* Asegura que esté sobre el pulso */
+}
+
+/* El pulso rojo para los lugares */
+.marker-pulse {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ff4136; /* Mismo color rojo */
+  opacity: 0.7;
+  z-index: 0; /* Detrás del pin */
+
+  /* Centrado perfecto */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  /* Nombre de la animación */
+  animation: pulse-red 2s infinite;
+}
+
+/* Definición de la animación */
+@keyframes pulse-red {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.7;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+  }
+}
