@@ -2,12 +2,14 @@
 "use client"
 
 import MapComponent from "@/components/map-component";
+import MapOverlay from "@/components/map-overlay";
 
 export default function AppPage() {
-
     return (
         <div>
-            <MapComponent/>
+            <MapOverlay>
+                <MapComponent/>
+            </MapOverlay>
         </div>
     )
 }
