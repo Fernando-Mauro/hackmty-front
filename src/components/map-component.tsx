@@ -46,7 +46,25 @@ const transformRequest = (url: string, resourceType?: string) => {
     return { url }
 }
 
+interface Place {
+    id: number;
+    name: string;
+    latitude: number;
+    longitude: number;
+}
+
 export default function MapComponent() {
+    const [places, setPlaces] = useState<Place[]>([]);
+
+    useEffect(() => {
+        const fetchPlaces = async () => {
+            const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getPlaces`);
+            const places = await data.json();
+            setPlaces(places);
+        };
+
+        fetchPlaces();
+    }, []);
 
     const [initialViewState, setInitialViewState] = useState({
         longitude: EXAMPLE_LONGITUDE,
@@ -57,10 +75,8 @@ export default function MapComponent() {
 
     // NUEVO: Pedir la ubicación cuando el componente cargue
     useEffect(() => {
-        // Comprobar si el navegador soporta geolocalización
         if (navigator.geolocation) {
 
-            // Pedir la ubicación. Esto mostrará el popup de "Permitir ubicación"
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     // Éxito: El usuario aceptó
@@ -102,14 +118,34 @@ export default function MapComponent() {
                     <Marker
                         longitude={userLocation.longitude}
                         latitude={userLocation.latitude}
-                        anchor="bottom" // Para que la punta del pin esté en las coordenadas
+                        anchor="center" // 'center' es mejor para un punto
                     >
-                        {/* Puedes poner un icono de FontAwesome, una imagen, o un simple emoji */}
-                        <div style={{ fontSize: '2.5rem', color: '#0070f3' }}>
-                            📍
+                        {/* Este es el marcador estilo Google Maps */}
+                        <div className="user-marker-container">
+                            <div className="user-marker-pulse"></div>
+                            <div className="user-marker-dot"></div>
                         </div>
                     </Marker>
                 )}
+
+                {places.map((place) => (
+                    <Marker
+                        key={place.id}
+                        longitude={place.longitude}
+                        latitude={place.latitude}
+                        // Hacemos clic en el marcador
+                        onClick={(e) => {
+                            e.originalEvent.stopPropagation(); // Evita que el clic "atraviese" al mapa
+                            console.log("Clic en:", place.name);
+                            // Aquí podrías abrir un Popup
+                        }}
+                    >
+                        {/* Este es nuestro marcador moderno con CSS */}
+                        <div className="marker-pin">
+                            <div className="marker-pulse"></div>
+                        </div>
+                    </Marker>
+                ))}
             </Map>
         </div>
     )

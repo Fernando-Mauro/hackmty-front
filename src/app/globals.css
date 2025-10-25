@@ -158,3 +158,95 @@
   background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
   background-size: 1000px 100%;
 }
+
+/* En tu archivo CSS, por ejemplo: globals.css */
+
+.marker-pin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ff4136; /* Un rojo vibrante */
+  border: 2px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transform: translate(-50%, -50%); /* Centra el pin */
+}
+
+.marker-pulse {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ff4136;
+  opacity: 0.7;
+  animation: pulse 2s infinite;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Contenedor principal para centrar el punto */
+.user-marker-container {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+
+/* El punto azul central */
+.user-marker-dot {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background-color: #4285F4; /* Azul de Google */
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  /* Centrado perfecto */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1; /* Asegura que el punto esté sobre el pulso */
+}
+
+/* El halo azul que pulsa */
+.user-marker-pulse {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background-color: #4285F4;
+  border-radius: 50%;
+  opacity: 0.5;
+  z-index: 0; /* Detrás del punto */
+  
+  /* Centrado perfecto */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* Animación de pulso */
+  animation: pulse-blue 2s infinite ease-out;
+}
+
+@keyframes pulse-blue {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3); /* Crece al triple */
+    opacity: 0;
+  }
+} 
