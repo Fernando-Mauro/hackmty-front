@@ -17,7 +17,6 @@ export default function MapOverlay({
 
     return (
         <div className="relative h-screen w-full overflow-hidden bg-gray-100">
-            {/* Map Container - Placeholder for your existing map */}
             {
                 children
             }
