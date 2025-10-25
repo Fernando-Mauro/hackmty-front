@@ -54,6 +54,7 @@ export default function LoginForm() {
         credentials: "include",
       })
 
+
       if (!res.ok) {
         throw new Error("Credenciales inválidas")
       }
@@ -90,6 +91,13 @@ export default function LoginForm() {
       // Importante: las cookies solo se envían al mismo dominio.
       // Si tu API está en el mismo dominio o subdominio, puedes ajustar 'domain' y SameSite.
       // Para uso cross-site, SameSite=None y Secure=true son necesarios.
+
+      await fetch("/api/auth/set-cookie", {
+        method: "POST",
+        body: JSON.stringify({ token }),
+        headers: { "Content-Type": "application/json" },
+      });
+      
       setCookie("authToken", token, {
         days: 7,
         // domain: ".tudominio.com", // opcional: ajusta si frontend y api comparten eTLD+1
@@ -98,7 +106,7 @@ export default function LoginForm() {
       })
 
       console.log("Login successful, token guardado en cookie.")
-      
+
       router.push("/app")
       console.log("Redirigiendo a /app")
     } catch (error) {
