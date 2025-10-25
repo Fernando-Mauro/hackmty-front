@@ -1,8 +1,8 @@
 // Next.js MapLibre page backed by Amazon Location Service
 "use client"
 
-import { useState } from "react"
-import Map, { NavigationControl } from "react-map-gl/maplibre"
+import { useEffect, useState } from "react"
+import Map, { NavigationControl, Marker } from "react-map-gl/maplibre"
 import maplibreGl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
 
@@ -53,18 +53,63 @@ export default function MapComponent() {
         latitude: EXAMPLE_LATITUDE,
         zoom: 15,
     })
+    const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number } | null>(null);
+
+    // NUEVO: Pedir la ubicación cuando el componente cargue
+    useEffect(() => {
+        // Comprobar si el navegador soporta geolocalización
+        if (navigator.geolocation) {
+
+            // Pedir la ubicación. Esto mostrará el popup de "Permitir ubicación"
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // Éxito: El usuario aceptó
+                    const { latitude, longitude } = position.coords;
+
+                    // 1. Guardamos la ubicación para el Marker
+                    setUserLocation({ latitude, longitude });
+
+                    // 2. (Opcional) Centramos el mapa en el usuario
+                    setInitialViewState(prev => ({
+                        ...prev,
+                        latitude: latitude,
+                        longitude: longitude,
+                        zoom: 16, // Hacemos un zoom más cercano
+                    }));
+                },
+                (error) => {
+                    // Error: El usuario bloqueó el permiso o hubo un fallo
+                    console.error("Error al obtener la ubicación:", error.message);
+                }
+            );
+        } else {
+            console.log("Geolocalización no soportada por este navegador.");
+        }
+    }, []);
 
     return (
         <div style={{ height: "100vh", width: "100%" }}>
             <Map
                 {...initialViewState}
                 mapLib={maplibreGl}
-                transformRequest={transformRequest} 
+                transformRequest={transformRequest}
                 mapStyle={`https://maps.geo.${MAP_REGION}.amazonaws.com/maps/v0/maps/${MAP_NAME}/style-descriptor?key=${API_KEY}`}
                 onMove={(evt: any) => setInitialViewState(evt.viewState)}
                 style={{ width: "100%", height: "100%" }}
             >
                 {/* <NavigationControl position="top-left" /> */}
+                {userLocation && (
+                    <Marker
+                        longitude={userLocation.longitude}
+                        latitude={userLocation.latitude}
+                        anchor="bottom" // Para que la punta del pin esté en las coordenadas
+                    >
+                        {/* Puedes poner un icono de FontAwesome, una imagen, o un simple emoji */}
+                        <div style={{ fontSize: '2.5rem', color: '#0070f3' }}>
+                            📍
+                        </div>
+                    </Marker>
+                )}
             </Map>
         </div>
     )
