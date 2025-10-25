@@ -8,16 +8,81 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown, MessageCircleDashed, FlameKindling, Flame } from "lucide-react"
+import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown, MessageCircleDashed, FlameKindling, Flame, ImageIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ButtonSequence } from "./button-sequence" // Importamos el hijo
+import { Select } from "@radix-ui/react-select"
+import Image from "next/image"
 
-// --- COMPONENTE MAP-OVERLAY (PRINCIPAL) ---
+
+interface Place {
+    id: number;
+    name: string;
+    latitude: number;
+    longitude: number;
+}
+
 export default function MapOverlay({
     children
 }: {
     children: React.ReactNode
 }) {
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+    const [dayOfWeek, setDayOfWeek] = useState<number | null>(null);
+
+    const dayOptions = [
+        { id: 1, label: 'L' },
+        { id: 2, label: 'M' },
+        { id: 3, label: 'M' },
+        { id: 4, label: 'J' },
+        { id: 5, label: 'V' },
+        { id: 6, label: 'S' },
+        { id: 0, label: 'D' }, // Domingo = 0
+    ];
+
+    const specialDayOptions = [
+        { id: 7, label: 'Todos los días' }, // Todos = 7
+        { id: 8, label: 'Fines de semana' }, // Fines = 8
+    ];
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Usamos FileReader para obtener un Data URL (base64)
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setImagePreview(null);
+        }
+    };
+
+    const handleRemoveImage = () => {
+        setImagePreview(null);
+        // Reseteamos el valor del input por si el usuario
+        // quiere volver a subir la MISMA imagen
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const [places, setPlaces] = useState<Place[]>([]);
+
+    useEffect(() => {
+        const fetchPlaces = async () => {
+            const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getPlaces`);
+            const places = await data.json();
+            setPlaces(places);
+        };
+
+        fetchPlaces();
+    }, []);
+
     // --- Estados de Archivo 1 ---
     const [searchQuery, setSearchQuery] = useState("")
     const [activeTab, setActiveTab] = useState<"map" | "profile" | "meal" | "featured">("map")
@@ -85,7 +150,6 @@ export default function MapOverlay({
     }, [isDragging, sheetHeight])
 
 
-    // --- Handlers para ABRIR el Sheet ---
     const handleOpenSheet = (option: "promotion" | "offer") => {
         setSelectedOption(option)
         setShowBottomSheet(true)
@@ -185,7 +249,7 @@ export default function MapOverlay({
                             <MapPin className="h-6 w-6" />
                             <span className="text-xs font-medium">{"Map"}</span>
                         </button>
-                         <button
+                        <button
                             onClick={() => setActiveTab("meal")}
                             className={cn(
                                 "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
@@ -221,7 +285,7 @@ export default function MapOverlay({
                             <User className="h-6 w-6" />
                             <span className="text-xs font-medium">{"Profile"}</span>
                         </button>
-                        
+
                     </div>
                 </div>
             </div>
@@ -245,7 +309,6 @@ export default function MapOverlay({
                             onClick={closeSheet}
                         />
 
-                        {/* Bottom Sheet */}
                         <motion.div
                             className="absolute bottom-0 left-0 right-0 z-40"
                             style={{
@@ -268,11 +331,11 @@ export default function MapOverlay({
                                         <div className="h-1.5 w-12 rounded-full bg-gray-300 transition-colors hover:bg-gray-400" />
                                     </div>
 
-                                    {/* Sheet Content */}
+                                    {/* Post some */}
                                     <div className="flex-1 overflow-y-auto px-6 pb-6">
                                         <div className="mb-6 flex items-center justify-between">
                                             <h2 className="text-2xl font-bold" style={{ color: "var(--brand-blue)" }}>
-                                                {selectedOption === "promotion" ? "Publicar Promoción" : "Publicar Descuentazo"}
+                                                {selectedOption === "promotion" ? "Post Promotion" : "Post Offer"}
                                             </h2>
                                             <button
                                                 onClick={closeSheet}
@@ -282,32 +345,175 @@ export default function MapOverlay({
                                             </button>
                                         </div>
 
+                                        {
+                                            selectedOption === "promotion" ? (
+                                                <form className="space-y-4">
+                                                    <div className="space-y-1">
+                                                        <Label htmlFor="title">{"Title"}</Label>
+                                                        <Input id="title" placeholder={"Example: 2x1 in Coffee"} />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label htmlFor="description">{"Description"}</Label>
+                                                        <Textarea id="description" placeholder="Add details, conditions, location..." />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label htmlFor="price">{"Price"}</Label>
+                                                        <Input id="price" type="number" placeholder="$ 0.00" />
+                                                    </div>
+
+
+                                                    {/* select input for where is the promotion */}
+                                                    <div className="space-y-1">
+                                                        <Label htmlFor="location">{"Location"}</Label>
+                                                        <select className="w-full border border-gray-300 rounded-md p-2">
+                                                            {places.map((place) => (
+                                                                <option key={place.id} value={place.id}>
+                                                                    {place.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor="start_time" className="mb-2 block text-sm font-medium text-gray-700">
+                                                                {"Hora de Inicio"}
+                                                            </Label>
+                                                            <Input
+                                                                id="start_time"
+                                                                type="time"
+                                                                value={startTime}
+                                                                onChange={(e) => setStartTime(e.target.value)}
+                                                                className="h-12 rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)]"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor="end_time" className="mb-2 block text-sm font-medium text-gray-700">
+                                                                {"Hora de Fin"}
+                                                            </Label>
+                                                            <Input
+                                                                id="end_time"
+                                                                type="time"
+                                                                value={endTime}
+                                                                onChange={(e) => setEndTime(e.target.value)}
+                                                                className="h-12 rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)]"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    {/* --- SELECTOR DE DÍA --- */}
+                                                    <div className="space-y-2">
+                                                        <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                                            Días de la semana
+                                                        </Label>
+
+                                                        {/* Los 7 botones de días */}
+                                                        <div className="flex justify-between gap-1">
+                                                            {dayOptions.map((day) => (
+                                                                <Button
+                                                                    key={day.id}
+                                                                    type="button"
+                                                                    onClick={() => setDayOfWeek(day.id)}
+                                                                    variant="outline"
+                                                                    className={cn(
+                                                                        "h-10 w-10 p-0 rounded-full transition-all", // Botones redondos
+                                                                        dayOfWeek === day.id
+                                                                            ? "bg-[var(--brand-blue)] text-white scale-105 shadow-md"
+                                                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                                    )}
+                                                                >
+                                                                    {day.label}
+                                                                </Button>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Los 2 botones especiales */}
+                                                        <div className="grid grid-cols-2 gap-2 pt-2">
+                                                            {specialDayOptions.map((day) => (
+                                                                <Button
+                                                                    key={day.id}
+                                                                    type="button"
+                                                                    onClick={() => setDayOfWeek(day.id)}
+                                                                    variant="outline"
+                                                                    className={cn(
+                                                                        "h-11 rounded-xl text-xs sm:text-sm transition-all",
+                                                                        dayOfWeek === day.id
+                                                                            ? "bg-[var(--brand-blue)] text-white scale-105 shadow-md"
+                                                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                                    )}
+                                                                >
+                                                                    {day.label}
+                                                                </Button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="image">{"Image"}</Label>
+
+                                                        {imagePreview ? (
+                                                            // --- 1. ESTADO DE VISTA PREVIA ---
+                                                            <div className="relative group w-full h-48 rounded-xl overflow-hidden">
+                                                                <Image
+                                                                    src={imagePreview}
+                                                                    alt="Previews"
+                                                                    layout="fill"
+                                                                    objectFit="cover"
+                                                                    className="transition-transform group-hover:scale-105"
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="destructive"
+                                                                    size="icon"
+                                                                    onClick={handleRemoveImage}
+                                                                    className="absolute top-2 right-2 rounded-full h-8 w-8 z-10 opacity-70 group-hover:opacity-100 transition-opacity"
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                    <span className="sr-only">{"Remove image"}</span>
+                                                                </Button>
+                                                            </div>
+                                                        ) : (
+                                                            // --- 2. ESTADO INICIAL (DROPZONE) ---
+                                                            <div
+                                                                onClick={() => fileInputRef.current?.click()}
+                                                                className="w-full h-48 rounded-xl border-2 border-dashed border-gray-300
+                       flex flex-col items-center justify-center
+                       text-gray-500 hover:border-[var(--brand-blue)] hover:text-[var(--brand-blue)]
+                       transition-colors duration-200 cursor-pointer bg-gray-50/50"
+                                                            >
+                                                                <ImageIcon className="h-10 w-10 mb-2" />
+                                                                <span className="font-medium text-sm">{"Click to upload an image"}</span>
+                                                                <span className="text-xs text-gray-400">{"PNG, JPG, GIF (Max. 5MB)"}</span>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Input de archivo real, pero oculto */}
+                                                        <Input
+                                                            ref={fileInputRef}
+                                                            id="image" // El 'id' coincide con el 'htmlFor' del Label
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={handleImageChange}
+                                                            className="hidden" // ¡Clave! Ocultamos el input feo
+                                                        />
+                                                    </div>
+                                                    <Button
+                                                        type="submit"
+                                                        className="w-full"
+                                                        style={{
+                                                            backgroundColor: selectedOption === "promotion" ? "#D22E1E" : "#004878",
+                                                            color: "white",
+                                                        }}
+                                                    >
+                                                        {"Publish"}
+                                                    </Button>
+                                                </form>
+                                            ) : (
+                                                <p className="mb-4 text-gray-600">
+                                                    {"Ofrece un descuentazo irresistible y destaca entre la competencia."}
+                                                </p>
+                                            )
+                                        }
                                         {/* Formulario (Contenido personalizado) */}
-                                        <form className="space-y-4">
-                                            {/* ... (tu formulario con Título, Descripción, Precio, etc.) ... */}
-                                            <div>
-                                                <Label htmlFor="title">{"Título"}</Label>
-                                                <Input id="title" placeholder={selectedOption === "promotion" ? "Ej: 2x1 en Cafés" : "Ej: Audífonos a $100"} />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor="description">{"Descripción"}</Label>
-                                                <Textarea id="description" placeholder="Añade detalles, condiciones, ubicación..." />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor="price">{"Precio (Opcional)"}</Label>
-                                                <Input id="price" type="number" placeholder="$ 0.00" />
-                                            </div>
-                                            <Button
-                                                type="submit"
-                                                className="w-full"
-                                                style={{
-                                                    backgroundColor: selectedOption === "promotion" ? "#D22E1E" : "#004878",
-                                                    color: "white",
-                                                }}
-                                            >
-                                                {"Publicar"}
-                                            </Button>
-                                        </form>
+
                                     </div>
                                 </div>
                             </div>
