@@ -323,6 +323,7 @@ export default function MapComponent() {
                                                         src={selectedPlace.image_url}
                                                         alt={selectedPlace.name}
                                                         style={{ objectFit: 'cover' }}
+                                                        className="w-full h-full"
                                                     />
                                                 </div>
                                             )}
