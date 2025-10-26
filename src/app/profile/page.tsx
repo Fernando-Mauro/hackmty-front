@@ -1,27 +1,17 @@
-import Card from "@/components/card";
-import CardSection from "@/components/cardsection";
-import { BadgePercent, User } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Star, User } from "lucide-react";
 
-// Sample data
-const featured = [
-  { name: "RESTAURANT 1", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK0eZ2onIuGCYMnIQEP0DQJxKYGw5K2RCQtQ&s", votes:286},
-  { name: "RESTAURANT 2", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK0eZ2onIuGCYMnIQEP0DQJxKYGw5K2RCQtQ&s", votes:252},
-  { name: "RESTAURANT 3", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK0eZ2onIuGCYMnIQEP0DQJxKYGw5K2RCQtQ&s", votes:190},
-  { name: "RESTAURANT 4", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK0eZ2onIuGCYMnIQEP0DQJxKYGw5K2RCQtQ&s", votes:211},
-];
-
-const healthy = [
-  { name: "RESTAURANT 1", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png",votes:22},
-  { name: "RESTAURANT 2", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png", votes:22 },
-  { name: "RESTAURANT 3", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png", votes:22 },
-  { name: "RESTAURANT 4", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png",votes:22 },
-];
-
-const pizza = [
-  { name: "RESTAURANT 1", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg", votes:22 },
-  { name: "RESTAURANT 2", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg",votes:22 },
-  { name: "RESTAURANT 3", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg", votes:22 },
-  { name: "RESTAURANT 4", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg",votes:22 },
+const profile = [
+  {
+    name: "NOMBRE DEL USERR",
+    username: "user123",
+    email: "user123@email.com",
+    image:
+      "https://www.nicepng.com/png/full/202-2022264_usuario-annimo-usuario-annimo-user-icon-png-transparent.png",
+    rating: 4.5,
+    upvotes: 230,
+    downvotes: 20,
+    posts: 20,
+  },
 ];
 
 const flexCenter = { display: "inline-flex", alignItems: "center", gap: "10px" };
@@ -29,47 +19,134 @@ const flexCenter = { display: "inline-flex", alignItems: "center", gap: "10px" }
 export default function Profile() {
   return (
     <div style={{ margin: "20px" }}>
-
-      {/* Promotions and Profile */}
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "35px", marginBottom: "10px" }}>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "35px",
+          marginBottom: "10px",
+        }}
+      >
         <div style={flexCenter}>
-          <BadgePercent size={34} color="#cd2427"/>
-          <button style={{ fontSize: "30px" }}>Promos</button>
+          <User size={34} color="#cd2427" />
+          <button style={{ fontSize: "30px" }}>Profile</button>
         </div>
       </div>
 
-      {/* Promo categories */}
-      <div style={{ display: "flex", gap: "12px", marginBottom: "8px", overflowX: "auto", whiteSpace: "nowrap", padding: "8px 0" }}>
-        <button style={{ fontSize: "16px", flex: "0 0 auto", background: "#013e5b", color: "white", border: "none", padding: "8px 14px", borderRadius: "9999px", cursor: "pointer" }}>Sushi</button>
-        <button style={{ fontSize: "16px", flex: "0 0 auto", background: "#013e5b", color: "white", border: "none", padding: "8px 14px", borderRadius: "9999px", cursor: "pointer" }}>Chicken</button>
-        <button style={{ fontSize: "16px", flex: "0 0 auto", background: "#013e5b", color: "white", border: "none", padding: "8px 14px", borderRadius: "9999px", cursor: "pointer" }}>Desserts</button>
-        <button style={{ fontSize: "16px", flex: "0 0 auto", background: "#013e5b", color: "white", border: "none", padding: "8px 14px", borderRadius: "9999px", cursor: "pointer" }}>Coffee</button>
-        <button style={{ fontSize: "16px", flex: "0 0 auto", background: "#013e5b", color: "white", border: "none", padding: "8px 14px", borderRadius: "9999px", cursor: "pointer" }}>Paninis</button>
-        <button style={{ fontSize: "16px", flex: "0 0 auto", background: "#013e5b", color: "white", border: "none", padding: "8px 14px", borderRadius: "9999px", cursor: "pointer" }}>Healthy</button>
-        <button style={{ fontSize: "16px", flex: "0 0 auto", background: "#013e5b", color: "white", border: "none", padding: "8px 14px", borderRadius: "9999px", cursor: "pointer" }}>Pasta</button>
+      {/* Contenido del perfil */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+          padding: "8px 0",
+        }}
+      >
+        {profile.map((user, index) => (
+          <div key={index}>
+            {/* Primer cuadro: perfil */}
+            <div
+              style={{
+                backgroundColor: "#1c6f95ff",
+                borderRadius: "7px",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                color: "white",
+                maxWidth: "600px",
+                margin: "auto",
+                gap: "20px",
+              }}
+            >
+              {/* Info izquierda */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <h2 style={{ margin: "0 0 8px 0" }}>{user.name}</h2>
+
+                {/* Rating */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <p style={{ margin: 0, fontWeight: "bold" }}>Rating:</p>
+                  <p style={{ margin: 0 }}>{user.rating}</p>
+                  <Star size={18} color="gold" />
+                </div>
+
+                {/* Votos */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#ddd" }}>
+                  <p style={{ margin: 0 }}>Upvotes: {user.upvotes}</p>
+                  <ArrowBigUp color="#3bb839ff" />
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#ddd" }}>
+                  <p style={{ margin: 0 }}>Downvotes: {user.downvotes}</p>
+                  <ArrowBigDown color="#cd2427" />
+                </div>
+
+                <p style={{ margin: 0, color: "#ddd" }}>
+                  Posts: {user.posts}
+                </p>
+              </div>
+
+              {/* Imagen a la derecha */}
+              <img
+                src={user.image}
+                alt={user.name}
+                style={{
+                  width: "130px",
+                  height: "130px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+
+            {/* Segundo cuadro: info de usuario y botón */}
+            <div
+              style={{
+                backgroundColor: "#144d68",
+                borderRadius: "7px",
+                padding: "10px",
+                color: "white",
+                maxWidth: "600px",
+                margin: "20px auto 0",
+                textAlign: "center",
+              }}
+            >
+              <p style={{ marginBottom: "8px" }}>
+                <strong>Username:</strong> {user.username}
+              </p>
+              <p style={{ marginBottom: "15px" }}>
+                <strong>Email:</strong> {user.email}
+              </p>
+
+              <button
+                style={{
+                  backgroundColor: "#cd2427",
+                  color: "white",
+                  border: "none",
+                  padding: "5px 20px",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                Reset Password
+              </button>
+            </div>
+            <div style={{ display: "flex",justifyContent: "center", alignItems: "center",}}>
+                <img src="/logo.PNG" style={{
+                  width: "115px",
+                  marginTop: "20px",
+                  marginBottom:"20px"
+                }}/>
+            </div>
+            <div style={{ display: "flex",justifyContent: "center", alignItems: "center",}}><p>By Map My Meal</p></div>
+
+          </div>
+        ))}
       </div>
-
-      {/* Featured */}
-      <CardSection name={"Featured"}>
-        {featured.map((r, index) => (
-          <Card name={r.name} image={r.image} votes={r.votes} key={index} />
-        ))}
-      </CardSection>
-
-      {/* Healthy */}
-      <CardSection name={"Healthy"}>
-        {healthy.map((r, index) => (
-          <Card name={r.name} image={r.image} votes={r.votes} key={index} />
-        ))}
-      </CardSection>
-
-      {/* Pizza */}
-      <CardSection name={"Pizza"}>
-        {pizza.map((r, index) => (
-          <Card name={r.name} image={r.image} votes={r.votes} key={index} />
-        ))}
-      </CardSection>
-
     </div>
   );
 }
