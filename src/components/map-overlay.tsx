@@ -14,6 +14,7 @@ import { ButtonSequence } from "./button-sequence" // Importamos el hijo
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import MealChat from "./meal-chat"
+import FeaturedPopup from "./featured-popup"
 
 interface Place {
     id: number;
@@ -193,7 +194,7 @@ export default function MapOverlay({
             }
 
             {/* Top Overlay - Search Bar y Botón + */}
-            {activeTab !== "meal" && (
+            {activeTab !== "meal" && activeTab !== "featured" && (
             <div className="absolute left-0 right-0 top-0 z-10 p-4 animate-in fade-in slide-in-from-top duration-500">
                 <div className="mx-auto flex max-w-2xl items-center gap-3">
                     {/* Search Bar */}
@@ -256,7 +257,7 @@ export default function MapOverlay({
             )}
 
             {/* Bottom Navigation */}
-            {activeTab !== "meal" && (
+            {activeTab !== "meal" && activeTab !== "featured" && (
             <div className="absolute bottom-0 left-0 right-0 z-10 animate-in fade-in slide-in-from-bottom duration-500">
                 <div className="mx-auto max-w-2xl px-4 pb-safe">
                     <div className="mb-4 flex items-center justify-around rounded-3xl bg-white p-2 shadow-2xl">
@@ -337,6 +338,21 @@ export default function MapOverlay({
                             </div>
                             <MealChat onClose={() => setActiveTab("map")} />
                         </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Fullscreen Featured Popup */}
+            <AnimatePresence>
+                {activeTab === "featured" && (
+                    <motion.div
+                        className="absolute inset-0 z-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <FeaturedPopup onClose={() => setActiveTab("map")} />
                     </motion.div>
                 )}
             </AnimatePresence>
