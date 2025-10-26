@@ -15,8 +15,8 @@ export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false)
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
     const [isHovering, setIsHovering] = useState(false)
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const [email, setEmail] = useState("judge@example.com")
+    const [password, setPassword] = useState("12345678")
     const [error, setError] = useState("")
     const [isLoading, setIsLoading] = useState(false)
 
