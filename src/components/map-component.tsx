@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion" // <--- Añadido de MapO
 import { X, MapPin, Star } from "lucide-react" // <--- Añadido de MapOverlay
 import { Button } from "@/components/ui/button" // <--- Añadido de MapOverlay
 import Image from "next/image" // <--- Añadido para mostrar detalles
+import PromotionsFromPlace from "./promotions-from-place"
 
 
 // Coordenadas de ejemplo
@@ -339,11 +340,7 @@ export default function MapComponent() {
 
                                             {
                                                 isExpanded  && (
-                                                    <div>
-                                                        {
-                                                            
-                                                        }
-                                                    </div>
+                                                    <PromotionsFromPlace placeId={selectedPlace.id} />
                                                 )
                                             }
                                         </div>
