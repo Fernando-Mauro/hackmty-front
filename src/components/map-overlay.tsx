@@ -237,8 +237,8 @@ export default function MapOverlay({
 
             {/* Top Overlay - Search Bar y Botón + */}
             {!shouldHideNavigation && (
-            <div className="absolute left-0 right-0 top-0 z-10 p-4 animate-in fade-in slide-in-from-top duration-500">
-                <div className="mx-auto flex max-w-2xl items-center gap-3">
+            <div className="absolute left-0 right-0 top-0 z-10 p-3 sm:p-4 md:p-6 animate-in fade-in slide-in-from-top duration-500">
+                <div className="mx-auto flex max-w-2xl items-center gap-2 sm:gap-3">
                     {/* Search Bar */}
                     <div
                         className={cn(
@@ -247,7 +247,7 @@ export default function MapOverlay({
                         )}
                     >
                         <Search
-                            className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors duration-300"
+                            className="absolute left-3 sm:left-4 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 transition-colors duration-300"
                             style={{ color: isSearchFocused ? "var(--brand-blue)" : "#6b7280" }}
                         />
                         <Input
@@ -258,16 +258,16 @@ export default function MapOverlay({
                             onFocus={() => setIsSearchFocused(true)}
                             onBlur={() => setIsSearchFocused(false)}
                             className={cn(
-                                "h-14 rounded-2xl border-2 bg-white pl-12 pr-12 text-base shadow-lg transition-all duration-300 focus:shadow-xl",
+                                "h-12 sm:h-14 rounded-xl sm:rounded-2xl border-2 bg-white pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base shadow-lg transition-all duration-300 focus:shadow-xl",
                                 isSearchFocused ? "border-[var(--brand-blue)]" : "border-transparent",
                             )}
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery("")}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 transition-all duration-200 hover:bg-gray-100 active:scale-95"
+                                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 rounded-full p-1 transition-all duration-200 hover:bg-gray-100 active:scale-95"
                             >
-                                <X className="h-5 w-5 text-gray-400" />
+                                <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                             </button>
                         )}
                     </div>
@@ -275,20 +275,20 @@ export default function MapOverlay({
                     {/* Botón + */}
                     <Button
                         size="icon"
-                        className="h-14 w-14 shrink-0 rounded-2xl bg-white text-gray-700 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-xl active:scale-95"
+                        className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl sm:rounded-2xl bg-white text-gray-700 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-xl active:scale-95"
                         style={{
                             borderWidth: "2px",
                             borderColor: !isHiddenBadge ? "var(--brand-blue)" : "transparent",
                         }}
                         onClick={() => setIsHiddenBadge(!isHiddenBadge)}
                     >
-                        <Plus className={cn("h-6 w-6 transition-transform duration-300", !isHiddenBadge && "rotate-45")} />
+                        <Plus className={cn("h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-300", !isHiddenBadge && "rotate-45")} />
                         <span className="sr-only">{"Añadir publicación"}</span>
                     </Button>
 
                 </div>
                 {/* Aquí se renderiza ButtonSequence */}
-                <div className="flex flex-col w-full items-end py-4 gap-3">
+                <div className="flex flex-col w-full items-end py-3 sm:py-4 gap-2 sm:gap-3">
                     <ButtonSequence
                         isHiddenBadge={isHiddenBadge}
                         onPromotionClick={() => handleOpenSheet("promotion")}
@@ -301,56 +301,56 @@ export default function MapOverlay({
             {/* Bottom Navigation */}
             {!shouldHideNavigation && (
             <div className="absolute bottom-0 left-0 right-0 z-10 animate-in fade-in slide-in-from-bottom duration-500">
-                <div className="mx-auto max-w-2xl px-4 pb-safe">
-                    <div className="mb-4 flex items-center justify-around rounded-3xl bg-white p-2 shadow-2xl">
+                <div className="mx-auto max-w-2xl px-3 sm:px-4 pb-safe">
+                    <div className="mb-3 sm:mb-4 flex items-center justify-around rounded-2xl sm:rounded-3xl bg-white p-1.5 sm:p-2 shadow-2xl">
                         {/* ... (tus botones de navegación: MapPin, User, Settings) ... */}
                         <button
                             onClick={() => setActiveTab("map")}
                             className={cn(
-                                "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
+                                "group relative flex flex-1 flex-col items-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-3 transition-all duration-300",
                                 activeTab === "map"
                                     ? "bg-[var(--brand-blue)] text-white shadow-lg"
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
-                            <MapPin className="h-6 w-6" />
-                            <span className="text-xs font-medium">{"Map"}</span>
+                            <MapPin className="h-5 w-5 sm:h-6 sm:w-6" />
+                            <span className="text-[10px] sm:text-xs font-medium">{"Map"}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab("meal")}
                             className={cn(
-                                "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
+                                "group relative flex flex-1 flex-col items-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-3 transition-all duration-300",
                                 // Nota: esta barra inferior no se muestra cuando activeTab === "meal",
                                 // así que este botón nunca está en estado "activo" aquí.
                                 "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
-                            <MessageCircleDashed className="h-6 w-6" />
-                            <span className="text-xs font-medium">{"Meal plan"}</span>
+                            <MessageCircleDashed className="h-5 w-5 sm:h-6 sm:w-6" />
+                            <span className="text-[10px] sm:text-xs font-medium">{"Meal plan"}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab("featured")}
                             className={cn(
-                                "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
+                                "group relative flex flex-1 flex-col items-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-3 transition-all duration-300",
                                 currentTab === "featured"
                                     ? "bg-[var(--brand-blue)] text-white shadow-lg"
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
-                            <Flame className="h-6 w-6" />
-                            <span className="text-xs font-medium">{"Featured"}</span>
+                            <Flame className="h-5 w-5 sm:h-6 sm:w-6" />
+                            <span className="text-[10px] sm:text-xs font-medium">{"Featured"}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab("profile")}
                             className={cn(
-                                "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
+                                "group relative flex flex-1 flex-col items-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-3 transition-all duration-300",
                                 currentTab === "profile"
                                     ? "bg-[var(--brand-blue)] text-white shadow-lg"
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
-                            <User className="h-6 w-6" />
-                            <span className="text-xs font-medium">{"Profile"}</span>
+                            <User className="h-5 w-5 sm:h-6 sm:w-6" />
+                            <span className="text-[10px] sm:text-xs font-medium">{"Profile"}</span>
                         </button>
 
                     </div>
@@ -369,13 +369,13 @@ export default function MapOverlay({
                         transition={{ duration: 0.2 }}
                     >
                         <div className="flex h-full w-full flex-col">
-                            <div className="flex items-center justify-between p-4 border-b">
-                                <h2 className="text-lg font-semibold" style={{ color: "var(--brand-blue)" }}>Meal plan</h2>
+                            <div className="flex items-center justify-between p-3 sm:p-4 border-b">
+                                <h2 className="text-base sm:text-lg font-semibold" style={{ color: "var(--brand-blue)" }}>Meal plan</h2>
                                 <button
                                     onClick={() => setActiveTab("map")}
-                                    className="rounded-full p-2 transition-all hover:bg-gray-100 active:scale-95"
+                                    className="rounded-full p-1.5 sm:p-2 transition-all hover:bg-gray-100 active:scale-95"
                                 >
-                                    <X className="h-6 w-6 text-gray-600" />
+                                    <X className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
                                 </button>
                             </div>
                             <MealChat onClose={() => setActiveTab("map")} />
@@ -444,52 +444,74 @@ export default function MapOverlay({
                             exit={{ y: "100%" }}
                             transition={{ type: "spring", damping: 20, stiffness: 150 }}
                         >
-                            <div className="mx-auto h-full max-w-2xl px-4">
-                                <div className="flex h-full flex-col rounded-t-3xl bg-white shadow-2xl">
+                            <div className="mx-auto h-full max-w-2xl px-3 sm:px-4">
+                                <div className="flex h-full flex-col rounded-t-2xl sm:rounded-t-3xl bg-white shadow-2xl">
                                     {/* Drag Handle */}
                                     <div
-                                        className="flex cursor-grab items-center justify-center py-4 active:cursor-grabbing"
+                                        className="flex cursor-grab items-center justify-center py-3 sm:py-4 active:cursor-grabbing"
                                         onTouchStart={handleDragStart}
                                         onMouseDown={handleDragStart}
                                     >
-                                        <div className="h-1.5 w-12 rounded-full bg-gray-300 transition-colors hover:bg-gray-400" />
+                                        <div className="h-1 sm:h-1.5 w-10 sm:w-12 rounded-full bg-gray-300 transition-colors hover:bg-gray-400" />
                                     </div>
 
                                     {/* Post some */}
-                                    <div className="flex-1 overflow-y-auto px-6 pb-6">
-                                        <div className="mb-6 flex items-center justify-between">
-                                            <h2 className="text-2xl font-bold" style={{ color: "var(--brand-blue)" }}>
+                                    <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6">
+                                        <div className="mb-4 sm:mb-6 flex items-center justify-between">
+                                            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--brand-blue)" }}>
                                                 {selectedOption === "promotion" ? "Post Promotion" : "Post Offer"}
                                             </h2>
                                             <button
                                                 onClick={closeSheet}
-                                                className="rounded-full p-2 transition-all hover:bg-gray-100 active:scale-95"
+                                                className="rounded-full p-1.5 sm:p-2 transition-all hover:bg-gray-100 active:scale-95"
                                             >
-                                                <X className="h-6 w-6 text-gray-500" />
+                                                <X className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
                                             </button>
                                         </div>
 
                                         {
                                             selectedOption === "promotion" ? (
-                                                <form className="space-y-4" onSubmit={handleFormSubmit}>
+                                                <form className="space-y-3 sm:space-y-4" onSubmit={handleFormSubmit}>
                                                     <div className="space-y-1">
-                                                        <Label htmlFor="title">{"Title"}</Label>
-                                                        <Input id="title" name="title" required placeholder={"Example: 2x1 in Coffee"} />
+                                                        <Label htmlFor="title" className="text-sm sm:text-base">{"Title"}</Label>
+                                                        <Input 
+                                                            id="title" 
+                                                            name="title" 
+                                                            required 
+                                                            placeholder={"Example: 2x1 in Coffee"}
+                                                            className="h-10 sm:h-12 text-sm sm:text-base"
+                                                        />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <Label htmlFor="description">{"Description"}</Label>
-                                                        <Textarea required id="description" name="description" placeholder="Add details, conditions, location..." />
+                                                        <Label htmlFor="description" className="text-sm sm:text-base">{"Description"}</Label>
+                                                        <Textarea 
+                                                            required 
+                                                            id="description" 
+                                                            name="description" 
+                                                            placeholder="Add details, conditions, location..."
+                                                            className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base"
+                                                        />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <Label htmlFor="price">{"Price"}</Label>
-                                                        <Input required id="price" name="price" type="number" placeholder="$ 0.00" />
+                                                        <Label htmlFor="price" className="text-sm sm:text-base">{"Price"}</Label>
+                                                        <Input 
+                                                            required 
+                                                            id="price" 
+                                                            name="price" 
+                                                            type="number" 
+                                                            placeholder="$ 0.00"
+                                                            className="h-10 sm:h-12 text-sm sm:text-base"
+                                                        />
                                                     </div>
 
 
                                                     {/* select input for where is the promotion */}
                                                     <div className="space-y-1">
-                                                        <Label htmlFor="location">{"Location"}</Label>
-                                                        <select name="place_id" className="w-full border border-gray-300 rounded-md p-2">
+                                                        <Label htmlFor="location" className="text-sm sm:text-base">{"Location"}</Label>
+                                                        <select 
+                                                            name="place_id" 
+                                                            className="w-full border border-gray-300 rounded-md p-2 sm:p-2.5 text-sm sm:text-base h-10 sm:h-12"
+                                                        >
                                                             {places.map((place) => (
                                                                 <option key={place.id} value={place.id}>
                                                                     {place.name}
@@ -497,9 +519,9 @@ export default function MapOverlay({
                                                             ))}
                                                         </select>
                                                     </div>
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div className="space-y-2">
-                                                            <Label htmlFor="start_time" className="mb-2 block text-sm font-medium text-gray-700">
+                                                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                                        <div className="space-y-1 sm:space-y-2">
+                                                            <Label htmlFor="start_time" className="mb-1 sm:mb-2 block text-xs sm:text-sm font-medium text-gray-700">
                                                                 {"Hora de Inicio"}
                                                             </Label>
                                                             <Input
@@ -508,11 +530,11 @@ export default function MapOverlay({
                                                                 name="start_time"
                                                                 value={startTime}
                                                                 onChange={(e) => setStartTime(e.target.value)}
-                                                                className="h-12 rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)]"
+                                                                className="h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)] text-sm sm:text-base"
                                                             />
                                                         </div>
-                                                        <div className="space-y-2">
-                                                            <Label htmlFor="end_time" className="mb-2 block text-sm font-medium text-gray-700">
+                                                        <div className="space-y-1 sm:space-y-2">
+                                                            <Label htmlFor="end_time" className="mb-1 sm:mb-2 block text-xs sm:text-sm font-medium text-gray-700">
                                                                 {"Hora de Fin"}
                                                             </Label>
                                                             <Input
@@ -521,14 +543,14 @@ export default function MapOverlay({
                                                                 name="end_time"
                                                                 value={endTime}
                                                                 onChange={(e) => setEndTime(e.target.value)}
-                                                                className="h-12 rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)]"
+                                                                className="h-10 sm:h-12 rounded-lg sm:rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)] text-sm sm:text-base"
                                                             />
                                                         </div>
                                                     </div>
 
                                                     {/* --- SELECTOR DE DÍA --- */}
-                                                    <div className="space-y-2">
-                                                        <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                                    <div className="space-y-1 sm:space-y-2">
+                                                        <Label className="mb-1 sm:mb-2 block text-xs sm:text-sm font-medium text-gray-700">
                                                             Días de la semana
                                                         </Label>
 
@@ -541,7 +563,7 @@ export default function MapOverlay({
                                                                     onClick={() => setDayOfWeek(day.id)}
                                                                     variant="outline"
                                                                     className={cn(
-                                                                        "h-10 w-10 p-0 rounded-full transition-all", // Botones redondos
+                                                                        "h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full transition-all text-xs sm:text-sm", // Botones redondos
                                                                         dayOfWeek === day.id
                                                                             ? "bg-[var(--brand-blue)] text-white scale-105 shadow-md"
                                                                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -553,7 +575,7 @@ export default function MapOverlay({
                                                         </div>
 
                                                         {/* Los 2 botones especiales */}
-                                                        <div className="grid grid-cols-2 gap-2 pt-2">
+                                                        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 pt-1.5 sm:pt-2">
                                                             {specialDayOptions.map((day) => (
                                                                 <Button
                                                                     key={day.id}
@@ -561,7 +583,7 @@ export default function MapOverlay({
                                                                     onClick={() => setDayOfWeek(day.id)}
                                                                     variant="outline"
                                                                     className={cn(
-                                                                        "h-11 rounded-xl text-xs sm:text-sm transition-all",
+                                                                        "h-9 sm:h-11 rounded-lg sm:rounded-xl text-[11px] sm:text-sm transition-all",
                                                                         dayOfWeek === day.id
                                                                             ? "bg-[var(--brand-blue)] text-white scale-105 shadow-md"
                                                                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -572,27 +594,26 @@ export default function MapOverlay({
                                                             ))}
                                                         </div>
                                                     </div>
-                                                    <div className="space-y-2">
-                                                        <Label htmlFor="image">{"Image"}</Label>
+                                                    <div className="space-y-1 sm:space-y-2">
+                                                        <Label htmlFor="image" className="text-sm sm:text-base">{"Image"}</Label>
 
                                                         {imagePreview ? (
                                                             // --- 1. ESTADO DE VISTA PREVIA ---
-                                                            <div className="relative group w-full h-48 rounded-xl overflow-hidden">
+                                                            <div className="relative group w-full h-36 sm:h-48 md:h-56 rounded-lg sm:rounded-xl overflow-hidden">
                                                                 <Image
                                                                     src={imagePreview}
                                                                     alt="Previews"
-                                                                    layout="fill"
-                                                                    objectFit="cover"
-                                                                    className="transition-transform group-hover:scale-105"
+                                                                    fill
+                                                                    className="object-cover transition-transform group-hover:scale-105"
                                                                 />
                                                                 <Button
                                                                     type="button"
                                                                     variant="destructive"
                                                                     size="icon"
                                                                     onClick={handleRemoveImage}
-                                                                    className="absolute top-2 right-2 rounded-full h-8 w-8 z-10 opacity-70 group-hover:opacity-100 transition-opacity"
+                                                                    className="absolute top-2 right-2 rounded-full h-7 w-7 sm:h-8 sm:w-8 z-10 opacity-70 group-hover:opacity-100 transition-opacity"
                                                                 >
-                                                                    <X className="h-4 w-4" />
+                                                                    <X className="h-3 w-3 sm:h-4 sm:w-4" />
                                                                     <span className="sr-only">{"Remove image"}</span>
                                                                 </Button>
                                                             </div>
@@ -600,14 +621,14 @@ export default function MapOverlay({
                                                             // --- 2. ESTADO INICIAL (DROPZONE) ---
                                                             <div
                                                                 onClick={() => fileInputRef.current?.click()}
-                                                                className="w-full h-48 rounded-xl border-2 border-dashed border-gray-300
+                                                                className="w-full h-36 sm:h-48 md:h-56 rounded-lg sm:rounded-xl border-2 border-dashed border-gray-300
                        flex flex-col items-center justify-center
                        text-gray-500 hover:border-[var(--brand-blue)] hover:text-[var(--brand-blue)]
                        transition-colors duration-200 cursor-pointer bg-gray-50/50"
                                                             >
-                                                                <ImageIcon className="h-10 w-10 mb-2" />
-                                                                <span className="font-medium text-sm">{"Click to upload an image"}</span>
-                                                                <span className="text-xs text-gray-400">{"PNG, JPG, GIF (Max. 5MB)"}</span>
+                                                                <ImageIcon className="h-8 w-8 sm:h-10 sm:w-10 mb-2" />
+                                                                <span className="font-medium text-xs sm:text-sm">{"Click to upload an image"}</span>
+                                                                <span className="text-[10px] sm:text-xs text-gray-400">{"PNG, JPG, GIF (Max. 5MB)"}</span>
                                                             </div>
                                                         )}
 
@@ -625,23 +646,23 @@ export default function MapOverlay({
                                                     </div>
                                                     {/* Mensaje de estado */}
                                                     {submitStatus === "success" && (
-                                                        <div className="flex items-center gap-2 p-4 rounded-xl bg-green-50 border border-green-200 animate-in fade-in slide-in-from-top duration-300">
-                                                            <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
-                                                            <p className="text-sm text-green-700 font-medium">
+                                                        <div className="flex items-center gap-2 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-green-50 border border-green-200 animate-in fade-in slide-in-from-top duration-300">
+                                                            <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
+                                                            <p className="text-xs sm:text-sm text-green-700 font-medium">
                                                                 ¡Promoción publicada exitosamente!
                                                             </p>
                                                         </div>
                                                     )}
 
                                                     {submitStatus === "error" && (
-                                                        <div className="flex items-center gap-2 p-4 rounded-xl bg-red-50 border border-red-200 animate-in fade-in slide-in-from-top duration-300">
-                                                            <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+                                                        <div className="flex items-center gap-2 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-red-50 border border-red-200 animate-in fade-in slide-in-from-top duration-300">
+                                                            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 shrink-0" />
                                                             <div className="flex-1">
-                                                                <p className="text-sm text-red-700 font-medium">
+                                                                <p className="text-xs sm:text-sm text-red-700 font-medium">
                                                                     Error al publicar
                                                                 </p>
                                                                 {errorMessage && (
-                                                                    <p className="text-xs text-red-600 mt-1">
+                                                                    <p className="text-[10px] sm:text-xs text-red-600 mt-1">
                                                                         {errorMessage}
                                                                     </p>
                                                                 )}
@@ -652,7 +673,7 @@ export default function MapOverlay({
                                                     <Button
                                                         type="submit"
                                                         disabled={isSubmitting || submitStatus === "success"}
-                                                        className="w-full relative"
+                                                        className="w-full relative h-10 sm:h-12 text-sm sm:text-base"
                                                         style={{
                                                             backgroundColor: 
                                                                 submitStatus === "success" ? "#10b981" :
@@ -663,13 +684,13 @@ export default function MapOverlay({
                                                         }}
                                                     >
                                                         {isSubmitting && (
-                                                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                                            <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin mr-2" />
                                                         )}
                                                         {submitStatus === "success" && (
-                                                            <CheckCircle className="h-5 w-5 mr-2" />
+                                                            <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                                                         )}
                                                         {submitStatus === "error" && (
-                                                            <AlertCircle className="h-5 w-5 mr-2" />
+                                                            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                                                         )}
                                                         {isSubmitting ? "Publicando..." : 
                                                          submitStatus === "success" ? "¡Publicado!" :
@@ -678,7 +699,7 @@ export default function MapOverlay({
                                                     </Button>
                                                 </form>
                                             ) : (
-                                                <p className="mb-4 text-gray-600">
+                                                <p className="mb-3 sm:mb-4 text-sm sm:text-base text-gray-600">
                                                     {"Ofrece un descuentazo irresistible y destaca entre la competencia."}
                                                 </p>
                                             )

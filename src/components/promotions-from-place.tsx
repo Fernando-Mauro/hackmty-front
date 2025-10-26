@@ -107,22 +107,22 @@ export default function PromotionsFromPlace({
     }, [placeId]);
 
     return (
-        <div>
+        <div className="h-full overflow-y-auto pb-6 px-2 sm:px-4">
             <Cardsection name="Promociones">
                 {loadingPromotions ? (
                     // Skeleton loading state
                     Array.from({ length: 4 }).map((_, idx) => <CardSkeleton key={`skeleton-${idx}`} />)
                 ) : errorPromotions ? (
                     // Error state
-                    <div className="col-span-full text-center py-8">
-                        <p className="text-red-500 text-sm">{errorPromotions}</p>
-                        <p className="text-gray-400 text-xs mt-2">Intenta recargar la página</p>
+                    <div className="col-span-full text-center py-6 sm:py-8 px-4">
+                        <p className="text-red-500 text-sm sm:text-base">{errorPromotions}</p>
+                        <p className="text-gray-400 text-xs sm:text-sm mt-2">Intenta recargar la página</p>
                     </div>
                 ) : promotions.length === 0 ? (
                     // Empty state
-                    <div className="col-span-full text-center py-8">
-                        <p className="text-gray-500 text-sm">No hay promociones disponibles</p>
-                        <p className="text-gray-400 text-xs mt-2">¡Sé el primero en publicar una!</p>
+                    <div className="col-span-full text-center py-6 sm:py-8 px-4">
+                        <p className="text-gray-500 text-sm sm:text-base">No hay promociones disponibles</p>
+                        <p className="text-gray-400 text-xs sm:text-sm mt-2">¡Sé el primero en publicar una!</p>
                     </div>
                 ) : (
                     // Success state with data
@@ -144,9 +144,9 @@ export default function PromotionsFromPlace({
                 ) : errorProducts ? (
                     // Error state
                     products.length === 0 ? (
-                        <div className="col-span-full text-center py-8">
-                            <p className="text-red-500 text-sm">{errorProducts}</p>
-                            <p className="text-gray-400 text-xs mt-2">Intenta recargar la página</p>
+                        <div className="col-span-full text-center py-6 sm:py-8 px-4">
+                            <p className="text-red-500 text-sm sm:text-base">{errorProducts}</p>
+                            <p className="text-gray-400 text-xs sm:text-sm mt-2">Intenta recargar la página</p>
                         </div>
                     ) : (
                         products.map((product: any) => (
@@ -162,9 +162,9 @@ export default function PromotionsFromPlace({
                     )
                 ) : products.length === 0 ? (
                     // Empty state
-                    <div className="col-span-full text-center py-8">
-                        <p className="text-gray-500 text-sm">No hay productos disponibles</p>
-                        <p className="text-gray-400 text-xs mt-2">¡Sé el primero en agregar uno!</p>
+                    <div className="col-span-full text-center py-6 sm:py-8 px-4">
+                        <p className="text-gray-500 text-sm sm:text-base">No hay productos disponibles</p>
+                        <p className="text-gray-400 text-xs sm:text-sm mt-2">¡Sé el primero en agregar uno!</p>
                     </div>
                 ) : (
                     // Success state with data
