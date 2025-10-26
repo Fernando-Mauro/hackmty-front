@@ -8,7 +8,7 @@ import maplibreGl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
 // import { s } from "framer-motion/client" // <--- Import sin usar, lo quitamos
 import { motion, AnimatePresence } from "framer-motion" // <--- Añadido de MapOverlay
-import { X, MapPin } from "lucide-react" // <--- Añadido de MapOverlay
+import { X, MapPin, Star } from "lucide-react" // <--- Añadido de MapOverlay
 import { Button } from "@/components/ui/button" // <--- Añadido de MapOverlay
 import Image from "next/image" // <--- Añadido para mostrar detalles
 
@@ -53,17 +53,21 @@ interface Place {
     // Añade campos opcionales que tu API pueda devolver
     description?: string;
     image_url?: string;
+    rating?: number | string;
+    address?: string;
 }
 
 export default function MapComponent() {
     // --- Estados del Mapa (Archivo 1) ---
     const [places, setPlaces] = useState<Place[]>([]);
+    const [loadingPlaces, setLoadingPlaces] = useState(true);
     const [initialViewState, setInitialViewState] = useState({
         longitude: EXAMPLE_LONGITUDE,
         latitude: EXAMPLE_LATITUDE,
         zoom: 15,
     })
     const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number } | null>(null);
+    const [loadingLocation, setLoadingLocation] = useState(true);
 
     // --- Estados del BottomSheet (copiados de Archivo 2) ---
     const [showPlaceSheet, setShowPlaceSheet] = useState(false)
@@ -77,6 +81,7 @@ export default function MapComponent() {
     useEffect(() => {
         const fetchPlaces = async () => {
             try {
+                setLoadingPlaces(true);
                 const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getPlaces`);
                 if (!data.ok) {
                     throw new Error(`Error al cargar lugares: ${data.status}`);
@@ -85,6 +90,8 @@ export default function MapComponent() {
                 setPlaces(placesData);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoadingPlaces(false);
             }
         };
         fetchPlaces();
@@ -92,6 +99,7 @@ export default function MapComponent() {
 
     // --- useEffect para Ubicación del Usuario (sin cambios) ---
     useEffect(() => {
+    setLoadingLocation(true);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -103,13 +111,16 @@ export default function MapComponent() {
                         longitude: longitude,
                         zoom: 16,
                     }));
+            setLoadingLocation(false);
                 },
                 (error) => {
                     console.error("Error al obtener la ubicación:", error.message);
+            setLoadingLocation(false);
                 }
             );
         } else {
             console.log("Geolocalización no soportada por este navegador.");
+        setLoadingLocation(false);
         }
     }, []);
 
@@ -175,6 +186,23 @@ export default function MapComponent() {
     return (
         //  👇 ¡IMPORTANTE! Añadido 'position: relative' y 'overflow: hidden'
         <div style={{ height: "100vh", width: "100%", position: "relative", overflow: "hidden" }}>
+            {/* Overlay de carga mientras se obtienen lugares o ubicación */}
+            {(loadingPlaces || loadingLocation) && (
+                <div className="absolute inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
+                    <div className="text-center">
+                        <div
+                            className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em]"
+                            style={{ color: "var(--brand-blue)" }}
+                            role="status"
+                        >
+                            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                                Cargando...
+                            </span>
+                        </div>
+                        <p className="mt-4 text-gray-700">Cargando mapa…</p>
+                    </div>
+                </div>
+            )}
             <Map
                 {...initialViewState}
                 mapLib={maplibreGl}
@@ -205,9 +233,9 @@ export default function MapComponent() {
                         latitude={place.latitude}
                         onClick={(e) => {
                             e.originalEvent.stopPropagation();
-                            setSelectedPlace(place);  // <-- ¡NUEVO! Establece el lugar
-                            setShowPlaceSheet(true); // <-- ¡NUEVO! Abre el panel
-                            setSheetHeight(50);      // <-- ¡NUEVO! Resetea la altura
+                            setSelectedPlace(place);
+                            setShowPlaceSheet(true);
+                            setSheetHeight(50);
                         }}
                     >
                         {/* Contenedor del marcador con etiqueta */}
@@ -261,34 +289,38 @@ export default function MapComponent() {
                                     </div>
 
                                     {/* Contenido del Panel (MODIFICADO) */}
-                                    <div className="flex-1 overflow-y-auto px-6 pb-6">
-                                        <div className="mb-4 flex items-center justify-between">
-                                            <h2 className="text-2xl font-bold" style={{ color: "var(--brand-blue)" }}>
+                                    <div className="flex-1 w-full overflow-y-auto px-6 pb-6">
+                                        <div className="mb-4 flex w-full">
+                                            <h2 className="text-xl font-bold text-center w-full"  style={{ color: "var(--brand-blue)" }}>
                                                 {selectedPlace.name}
                                             </h2>
-                                            <button
-                                                onClick={closeSheet}
-                                                className="rounded-full p-2 transition-all hover:bg-gray-100 active:scale-95"
-                                            >
-                                                <X className="h-6 w-6 text-gray-500" />
-                                            </button>
                                         </div>
+                                        <button
+                                            onClick={closeSheet}
+                                            className="rounded-full p-2 transition-all hover:bg-gray-100 active:scale-95 absolute top-7 right-7"
+                                        >
+                                            <X className="h-6 w-6 text-gray-500" />
+                                        </button>
 
+                                        {/* container for rating, and address */}
+                                        <div className="mb-4 flex w-full items-center justify-between">
+                                            <div className="flex items-center space-x-2">
+                                                <Star className="h-5 w-5 text-yellow-500" />
+                                                <span className="text-gray-700">{selectedPlace.rating || "No rating available"}</span>
+                                            </div>
+                                            <span className="text-gray-500">{selectedPlace.address || "No address available"}</span>
+                                        </div>
                                         {/* Aquí muestras los detalles del lugar */}
                                         <div className="space-y-4">
                                             {selectedPlace.image_url && (
                                                 <div className="relative w-full h-48 rounded-xl overflow-hidden">
-                                                    <Image
+                                                    <img
                                                         src={selectedPlace.image_url}
                                                         alt={selectedPlace.name}
-                                                        fill
                                                         style={{ objectFit: 'cover' }}
                                                     />
                                                 </div>
                                             )}
-                                            <p className="text-gray-700">
-                                                {selectedPlace.description || "No hay descripción disponible para este lugar."}
-                                            </p>
                                             {/* Puedes añadir más detalles aquí */}
                                             <Button className="w-full" style={{ backgroundColor: "var(--brand-blue)", color: "white" }}>
                                                 Ver promociones
