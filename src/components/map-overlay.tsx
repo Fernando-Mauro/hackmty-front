@@ -8,13 +8,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown, MessageCircleDashed, FlameKindling, Flame, ImageIcon } from "lucide-react"
+import { Search, MapPin, User, Plus, X, MessageCircleDashed, Flame, ImageIcon, Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ButtonSequence } from "./button-sequence" // Importamos el hijo
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import MealChat from "./meal-chat"
 import FeaturedPopup from "./featured-popup"
+import ProfilePopup from "./profile-popup"
 
 interface Place {
     id: number;
@@ -46,8 +47,8 @@ export default function MapOverlay({
     ];
 
     const specialDayOptions = [
-        { id: 7, label: 'Todos los días' }, // Todos = 7
-        { id: 8, label: 'Fines de semana' }, // Fines = 8
+        { id: 7, label: 'Todos los días' },
+        { id: 8, label: 'Fines de semana' },
     ];
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +99,11 @@ export default function MapOverlay({
     const [isDragging, setIsDragging] = useState(false)
     const dragStartY = useRef(0)
     const dragStartHeight = useRef(0)
+
+    // --- Estados de retroalimentación de formulario ---
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
+    const [errorMessage, setErrorMessage] = useState("")
 
     // --- Handlers de DRAG (de Archivo 3) ---
     const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
@@ -166,25 +172,54 @@ export default function MapOverlay({
     }
 
     // handle the form submission
-    const handleFormSubmit =  async (e: React.FormEvent) => {
+    const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const formData = new FormData(e.target as HTMLFormElement);
-
-        // add the additional fields
-        formData.append("start_time", startTime);
-        formData.append("end_time", endTime);
-        formData.append("day_of_week", dayOfWeek !== null ? dayOfWeek.toString() : "");
         
-        // print the data
-        for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
+        // Reset estados
+        setIsSubmitting(true);
+        setSubmitStatus("idle");
+        setErrorMessage("");
 
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/createDiscount`, {
-            method: "POST",
-            body: formData,
-            credentials: "include"
-        });
+        try {
+            const formData = new FormData(e.target as HTMLFormElement);
+
+            // add the additional fields
+            formData.append("start_time", startTime);
+            formData.append("end_time", endTime);
+            formData.append("day_of_week", dayOfWeek !== null ? dayOfWeek.toString() : "");
+
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/createDiscount`, {
+                method: "POST",
+                body: formData,
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            // Success!
+            setSubmitStatus("success");
+            
+            // Reset form después de 2 segundos
+            setTimeout(() => {
+                setSubmitStatus("idle");
+                closeSheet();
+                // Reset form fields
+                setStartTime("");
+                setEndTime("");
+                setDayOfWeek(null);
+                setImagePreview(null);
+                (e.target as HTMLFormElement).reset();
+            }, 2000);
+
+        } catch (error) {
+            setSubmitStatus("error");
+            setErrorMessage(error instanceof Error ? error.message : "Error al publicar la promoción");
+            console.error("Error submitting form:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
     return (
         <div className="relative h-screen w-full overflow-hidden bg-gray-100">
@@ -194,7 +229,7 @@ export default function MapOverlay({
             }
 
             {/* Top Overlay - Search Bar y Botón + */}
-            {activeTab !== "meal" && activeTab !== "featured" && (
+            {activeTab !== "meal" && activeTab !== "featured" && activeTab !== "profile" && (
             <div className="absolute left-0 right-0 top-0 z-10 p-4 animate-in fade-in slide-in-from-top duration-500">
                 <div className="mx-auto flex max-w-2xl items-center gap-3">
                     {/* Search Bar */}
@@ -257,7 +292,7 @@ export default function MapOverlay({
             )}
 
             {/* Bottom Navigation */}
-            {activeTab !== "meal" && activeTab !== "featured" && (
+            {activeTab !== "meal" && activeTab !== "featured" && activeTab !== "profile" && (
             <div className="absolute bottom-0 left-0 right-0 z-10 animate-in fade-in slide-in-from-bottom duration-500">
                 <div className="mx-auto max-w-2xl px-4 pb-safe">
                     <div className="mb-4 flex items-center justify-around rounded-3xl bg-white p-2 shadow-2xl">
@@ -353,6 +388,21 @@ export default function MapOverlay({
                         transition={{ duration: 0.2 }}
                     >
                         <FeaturedPopup onClose={() => setActiveTab("map")} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Fullscreen Profile Popup */}
+            <AnimatePresence>
+                {activeTab === "profile" && (
+                    <motion.div
+                        className="absolute inset-0 z-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <ProfilePopup onClose={() => setActiveTab("map")} />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -566,15 +616,58 @@ export default function MapOverlay({
                                                             className="hidden" // ¡Clave! Ocultamos el input feo
                                                         />
                                                     </div>
+                                                    {/* Mensaje de estado */}
+                                                    {submitStatus === "success" && (
+                                                        <div className="flex items-center gap-2 p-4 rounded-xl bg-green-50 border border-green-200 animate-in fade-in slide-in-from-top duration-300">
+                                                            <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
+                                                            <p className="text-sm text-green-700 font-medium">
+                                                                ¡Promoción publicada exitosamente!
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                    {submitStatus === "error" && (
+                                                        <div className="flex items-center gap-2 p-4 rounded-xl bg-red-50 border border-red-200 animate-in fade-in slide-in-from-top duration-300">
+                                                            <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+                                                            <div className="flex-1">
+                                                                <p className="text-sm text-red-700 font-medium">
+                                                                    Error al publicar
+                                                                </p>
+                                                                {errorMessage && (
+                                                                    <p className="text-xs text-red-600 mt-1">
+                                                                        {errorMessage}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
                                                     <Button
                                                         type="submit"
-                                                        className="w-full"
+                                                        disabled={isSubmitting || submitStatus === "success"}
+                                                        className="w-full relative"
                                                         style={{
-                                                            backgroundColor: selectedOption === "promotion" ? "#D22E1E" : "#004878",
+                                                            backgroundColor: 
+                                                                submitStatus === "success" ? "#10b981" :
+                                                                submitStatus === "error" ? "#ef4444" :
+                                                                selectedOption === "promotion" ? "#D22E1E" : "#004878",
                                                             color: "white",
+                                                            opacity: isSubmitting ? 0.7 : 1,
                                                         }}
                                                     >
-                                                        {"Publish"}
+                                                        {isSubmitting && (
+                                                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                                        )}
+                                                        {submitStatus === "success" && (
+                                                            <CheckCircle className="h-5 w-5 mr-2" />
+                                                        )}
+                                                        {submitStatus === "error" && (
+                                                            <AlertCircle className="h-5 w-5 mr-2" />
+                                                        )}
+                                                        {isSubmitting ? "Publicando..." : 
+                                                         submitStatus === "success" ? "¡Publicado!" :
+                                                         submitStatus === "error" ? "Reintentar" :
+                                                         "Publish"}
                                                     </Button>
                                                 </form>
                                             ) : (
