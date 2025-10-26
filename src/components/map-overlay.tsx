@@ -12,7 +12,8 @@ import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown, Me
 import { cn } from "@/lib/utils"
 import { ButtonSequence } from "./button-sequence" // Importamos el hijo
 import Image from "next/image"
-
+import { useRouter } from "next/navigation"
+import MealChat from "./meal-chat"
 
 interface Place {
     id: number;
@@ -26,6 +27,7 @@ export default function MapOverlay({
 }: {
     children: React.ReactNode
 }) {
+    const router = useRouter();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [startTime, setStartTime] = useState("");
@@ -191,6 +193,7 @@ export default function MapOverlay({
             }
 
             {/* Top Overlay - Search Bar y Botón + */}
+            {activeTab !== "meal" && (
             <div className="absolute left-0 right-0 top-0 z-10 p-4 animate-in fade-in slide-in-from-top duration-500">
                 <div className="mx-auto flex max-w-2xl items-center gap-3">
                     {/* Search Bar */}
@@ -250,8 +253,10 @@ export default function MapOverlay({
                     />
                 </div>
             </div>
+            )}
 
             {/* Bottom Navigation */}
+            {activeTab !== "meal" && (
             <div className="absolute bottom-0 left-0 right-0 z-10 animate-in fade-in slide-in-from-bottom duration-500">
                 <div className="mx-auto max-w-2xl px-4 pb-safe">
                     <div className="mb-4 flex items-center justify-around rounded-3xl bg-white p-2 shadow-2xl">
@@ -272,9 +277,9 @@ export default function MapOverlay({
                             onClick={() => setActiveTab("meal")}
                             className={cn(
                                 "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
-                                activeTab === "meal"
-                                    ? "bg-[var(--brand-blue)] text-white shadow-lg"
-                                    : "text-gray-500 hover:bg-gray-50 active:scale-95",
+                                // Nota: esta barra inferior no se muestra cuando activeTab === "meal",
+                                // así que este botón nunca está en estado "activo" aquí.
+                                "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
                             <MessageCircleDashed className="h-6 w-6" />
@@ -308,6 +313,33 @@ export default function MapOverlay({
                     </div>
                 </div>
             </div>
+            )}
+
+            {/* Fullscreen Meal Plan Popup */}
+            <AnimatePresence>
+                {activeTab === "meal" && (
+                    <motion.div
+                        className="absolute inset-0 z-50 bg-white"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <div className="flex h-full w-full flex-col">
+                            <div className="flex items-center justify-between p-4 border-b">
+                                <h2 className="text-lg font-semibold" style={{ color: "var(--brand-blue)" }}>Meal plan</h2>
+                                <button
+                                    onClick={() => setActiveTab("map")}
+                                    className="rounded-full p-2 transition-all hover:bg-gray-100 active:scale-95"
+                                >
+                                    <X className="h-6 w-6 text-gray-600" />
+                                </button>
+                            </div>
+                            <MealChat onClose={() => setActiveTab("map")} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Paneles de Contenido (Profile / Settings) */}
             {/* ... (tus paneles de 'profile' y 'settings' van aquí, sin cambios) ... */}
