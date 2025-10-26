@@ -6,7 +6,6 @@ import { useEffect, useState, useRef } from "react" // <--- Añadido useRef
 import Map, { NavigationControl, Marker } from "react-map-gl/maplibre"
 import maplibreGl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
-// import { s } from "framer-motion/client" // <--- Import sin usar, lo quitamos
 import { motion, AnimatePresence } from "framer-motion" // <--- Añadido de MapOverlay
 import { X, MapPin, Star } from "lucide-react" // <--- Añadido de MapOverlay
 import { Button } from "@/components/ui/button" // <--- Añadido de MapOverlay
@@ -76,6 +75,7 @@ export default function MapComponent() {
     const [isDragging, setIsDragging] = useState(false)
     const dragStartY = useRef(0)
     const dragStartHeight = useRef(0)
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // --- useEffect para Cargar Lugares (con manejo de errores) ---
     useEffect(() => {
@@ -99,7 +99,7 @@ export default function MapComponent() {
 
     // --- useEffect para Ubicación del Usuario (sin cambios) ---
     useEffect(() => {
-    setLoadingLocation(true);
+        setLoadingLocation(true);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -111,16 +111,16 @@ export default function MapComponent() {
                         longitude: longitude,
                         zoom: 16,
                     }));
-            setLoadingLocation(false);
+                    setLoadingLocation(false);
                 },
                 (error) => {
                     console.error("Error al obtener la ubicación:", error.message);
-            setLoadingLocation(false);
+                    setLoadingLocation(false);
                 }
             );
         } else {
             console.log("Geolocalización no soportada por este navegador.");
-        setLoadingLocation(false);
+            setLoadingLocation(false);
         }
     }, []);
 
@@ -139,7 +139,7 @@ export default function MapComponent() {
         const deltaY = dragStartY.current - clientY
         const windowHeight = window.innerHeight
         const deltaPercent = (deltaY / windowHeight) * 100
-        const newHeight = Math.min(Math.max(dragStartHeight.current + deltaPercent, 20), 90)
+        const newHeight = Math.min(Math.max(dragStartHeight.current + deltaPercent, 20), 100)
         setSheetHeight(newHeight)
     }
 
@@ -148,10 +148,13 @@ export default function MapComponent() {
         if (sheetHeight < 35) {
             setShowPlaceSheet(false)
             setSheetHeight(50)
+            setIsExpanded(false)
         } else if (sheetHeight < 65) {
             setSheetHeight(50)
+            setIsExpanded(false)
         } else {
-            setSheetHeight(90)
+            setSheetHeight(100)
+            setIsExpanded(true)
         }
     }
 
@@ -179,6 +182,7 @@ export default function MapComponent() {
     const closeSheet = () => {
         setShowPlaceSheet(false)
         setSheetHeight(50)
+        setIsExpanded(false)
         // Opcional: deseleccionar el lugar después de cerrar
         // setTimeout(() => setSelectedPlace(null), 300); 
     }
@@ -277,7 +281,7 @@ export default function MapComponent() {
                             exit={{ y: "100%" }}
                             transition={{ type: "spring", damping: 20, stiffness: 150 }}
                         >
-                            <div className="mx-auto h-full max-w-2xl px-4">
+                            <div className={isExpanded ? "h-full w-full px-0" : "mx-auto h-full max-w-2xl px-4"}>
                                 <div className="flex h-full flex-col rounded-t-3xl bg-white shadow-2xl">
                                     {/* Drag Handle */}
                                     <div
@@ -291,7 +295,7 @@ export default function MapComponent() {
                                     {/* Contenido del Panel (MODIFICADO) */}
                                     <div className="flex-1 w-full overflow-y-auto px-6 pb-6">
                                         <div className="mb-4 flex w-full">
-                                            <h2 className="text-xl font-bold text-center w-full"  style={{ color: "var(--brand-blue)" }}>
+                                            <h2 className="text-xl font-bold text-center w-full" style={{ color: "var(--brand-blue)" }}>
                                                 {selectedPlace.name}
                                             </h2>
                                         </div>
@@ -322,9 +326,26 @@ export default function MapComponent() {
                                                 </div>
                                             )}
                                             {/* Puedes añadir más detalles aquí */}
-                                            <Button className="w-full" style={{ backgroundColor: "var(--brand-blue)", color: "white" }}>
+                                            <Button
+                                                className={`w-full ${isExpanded ? 'hidden': ''}`}
+                                                style={{ backgroundColor: "var(--brand-blue)", color: "white" }}
+                                                onClick={() => {
+                                                    setSheetHeight(100)
+                                                    setIsExpanded(true)
+                                                }}
+                                            >
                                                 Ver promociones
                                             </Button>
+
+                                            {
+                                                isExpanded  && (
+                                                    <div>
+                                                        {
+                                                            
+                                                        }
+                                                    </div>
+                                                )
+                                            }
                                         </div>
                                     </div>
                                 </div>
