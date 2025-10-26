@@ -57,7 +57,11 @@ interface Place {
     address?: string;
 }
 
-export default function MapComponent() {
+interface MapComponentProps {
+    searchQuery?: string;
+}
+
+export default function MapComponent({ searchQuery = "" }: MapComponentProps) {
     // --- Estados del Mapa (Archivo 1) ---
     const [places, setPlaces] = useState<Place[]>([]);
     const [loadingPlaces, setLoadingPlaces] = useState(true);
@@ -188,6 +192,12 @@ export default function MapComponent() {
         // setTimeout(() => setSelectedPlace(null), 300); 
     }
 
+    // --- Filter places based on search query ---
+    const filteredPlaces = places.filter((place) => {
+        if (!searchQuery || searchQuery.trim() === "") return true;
+        return place.name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
     return (
         //  👇 IMPORTANT! Added 'position: relative' and 'overflow: hidden'
         <div style={{ height: "100vh", width: "100%", position: "relative", overflow: "hidden" }}>
@@ -231,7 +241,7 @@ export default function MapComponent() {
                 )}
 
                 {/* --- Marcadores de Lugares (onClick MODIFICADO) --- */}
-                {places.map((place) => (
+                {filteredPlaces.map((place) => (
                     <Marker
                         key={place.id}
                         longitude={place.longitude}

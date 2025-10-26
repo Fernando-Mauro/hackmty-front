@@ -2,8 +2,6 @@
 
 import type React from "react"
 import { X, User, Mail, Phone, MapPin, Settings, LogOut, Edit } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
 
 interface ProfilePopupProps {
     onClose: () => void

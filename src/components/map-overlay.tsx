@@ -24,11 +24,17 @@ interface Place {
     longitude: number;
 }
 
+interface MapOverlayProps {
+    children: React.ReactNode;
+    searchQuery?: string;
+    onSearchQueryChange?: (query: string) => void;
+}
+
 export default function MapOverlay({
-    children
-}: {
-    children: React.ReactNode
-}) {
+    children,
+    searchQuery = "",
+    onSearchQueryChange
+}: MapOverlayProps) {
     const router = useRouter();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -87,7 +93,6 @@ export default function MapOverlay({
     }, []);
 
     // --- Estados de Archivo 1 ---
-    const [searchQuery, setSearchQuery] = useState("")
     const [activeTab, setActiveTab] = useState<"map" | "profile" | "meal" | "featured">("map")
     const [isSearchFocused, setIsSearchFocused] = useState(false)
     const [isHiddenBadge, setIsHiddenBadge] = useState(true);
@@ -254,7 +259,7 @@ export default function MapOverlay({
                             type="text"
                             placeholder="Search for a place"
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => onSearchQueryChange?.(e.target.value)}
                             onFocus={() => setIsSearchFocused(true)}
                             onBlur={() => setIsSearchFocused(false)}
                             className={cn(
@@ -264,7 +269,7 @@ export default function MapOverlay({
                         />
                         {searchQuery && (
                             <button
-                                onClick={() => setSearchQuery("")}
+                                onClick={() => onSearchQueryChange?.("")}
                                 className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 rounded-full p-1 transition-all duration-200 hover:bg-gray-100 active:scale-95"
                             >
                                 <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
