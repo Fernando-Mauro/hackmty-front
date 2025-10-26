@@ -1,25 +1,12 @@
+"use client"
 import Card from "@/components/card";
 import CardSection from "@/components/cardsection";
 import { useEffect, useState } from "react";
 
-
-const healthy = [
-    { name: "RESTAURANT 1", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png", votes: 22 },
-    { name: "RESTAURANT 2", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png", votes: 22 },
-    { name: "RESTAURANT 3", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png", votes: 22 },
-    { name: "RESTAURANT 4", image: "https://static.wixstatic.com/media/d606f3_d6a45b4946284a25b980248196956726~mv2.png/v1/fill/w_280,h_281,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/HN%20pick.png", votes: 22 },
-];
-
-const pizza = [
-    { name: "RESTAURANT 1", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg", votes: 22 },
-    { name: "RESTAURANT 2", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg", votes: 22 },
-    { name: "RESTAURANT 3", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg", votes: 22 },
-    { name: "RESTAURANT 4", image: "https://static.promodescuentos.com/threads/raw/7B9Q5/873520_1/re/1024x1024/qt/60/873520_1.jpg", votes: 22 },
-];
-
 export default function Promos() {
 
     const [featured, setFeatured] = useState<any[]>([]);
+    const [top, setTop] = useState<any[]>([]);
 
     useEffect(() => {
         // fetch data
@@ -36,6 +23,24 @@ export default function Promos() {
 
         fetchFeatured();
     }, []);
+
+     useEffect(() => {
+        // fetch data
+        const fetchTop = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getTopDiscounts`);
+                const data = await response.json();
+                setTop(data);
+                console.log("Top data:", data);
+            } catch (error) {
+                console.error("Error fetching featured places:", error);
+            }
+        }
+
+        fetchTop();
+    }, []);
+
+    
 
     return (
         <div className="h-screen overflow-y-auto pb-20">
@@ -77,19 +82,28 @@ export default function Promos() {
                     )
                 }
 
+                {
+                    top.length > 0 && (
+                        <CardSection name={"Top Promotions"}>
+                            {top.map((r, index) => (
+                                <Card name={r.place_name} image={r.image_url} votes={r.votes} key={index} />
+                            ))}
+                        </CardSection>
+                    )
+                }
                 {/* Healthy */}
-                <CardSection name={"Healthy"}>
+                {/* <CardSection name={"Healthy"}>
                     {healthy.map((r, index) => (
                         <Card name={r.name} image={r.image} votes={r.votes} key={index} />
                     ))}
-                </CardSection>
+                </CardSection> */}
 
                 {/* Pizza */}
-                <CardSection name={"Pizza"}>
+                {/* <CardSection name={"Pizza"}>
                     {pizza.map((r, index) => (
                         <Card name={r.name} image={r.image} votes={r.votes} key={index} />
                     ))}
-                </CardSection>
+                </CardSection> */}
             </div>
         </div>
     );
