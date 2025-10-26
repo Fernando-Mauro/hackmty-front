@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import { Search, MapPin, User, Settings, Plus, X, Percent, BanknoteArrowDown, MessageCircleDashed, FlameKindling, Flame, ImageIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ButtonSequence } from "./button-sequence" // Importamos el hijo
-import { Select } from "@radix-ui/react-select"
 import Image from "next/image"
 
 
@@ -40,7 +39,7 @@ export default function MapOverlay({
         { id: 4, label: 'J' },
         { id: 5, label: 'V' },
         { id: 6, label: 'S' },
-        { id: 0, label: 'D' }, // Domingo = 0
+        { id: 0, label: 'D' },
     ];
 
     const specialDayOptions = [
@@ -163,8 +162,28 @@ export default function MapOverlay({
         setSheetHeight(50) // Resetear altura
     }
 
+    // handle the form submission
+    const handleFormSubmit =  async (e: React.FormEvent) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+
+        // add the additional fields
+        formData.append("start_time", startTime);
+        formData.append("end_time", endTime);
+        formData.append("day_of_week", dayOfWeek !== null ? dayOfWeek.toString() : "");
+        
+        // print the data
+        for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/createDiscount`, {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+        });
+    };
     return (
-        // 👇 IMPORTANTE: 'overflow-hidden' VUELVE a estar aquí
         <div className="relative h-screen w-full overflow-hidden bg-gray-100">
             {/* El Mapa (child) se renderiza aquí */}
             {
@@ -347,25 +366,25 @@ export default function MapOverlay({
 
                                         {
                                             selectedOption === "promotion" ? (
-                                                <form className="space-y-4">
+                                                <form className="space-y-4" onSubmit={handleFormSubmit}>
                                                     <div className="space-y-1">
                                                         <Label htmlFor="title">{"Title"}</Label>
-                                                        <Input id="title" placeholder={"Example: 2x1 in Coffee"} />
+                                                        <Input id="title" name="title" required placeholder={"Example: 2x1 in Coffee"} />
                                                     </div>
                                                     <div className="space-y-1">
                                                         <Label htmlFor="description">{"Description"}</Label>
-                                                        <Textarea id="description" placeholder="Add details, conditions, location..." />
+                                                        <Textarea required id="description" name="description" placeholder="Add details, conditions, location..." />
                                                     </div>
                                                     <div className="space-y-1">
                                                         <Label htmlFor="price">{"Price"}</Label>
-                                                        <Input id="price" type="number" placeholder="$ 0.00" />
+                                                        <Input required id="price" name="price" type="number" placeholder="$ 0.00" />
                                                     </div>
 
 
                                                     {/* select input for where is the promotion */}
                                                     <div className="space-y-1">
                                                         <Label htmlFor="location">{"Location"}</Label>
-                                                        <select className="w-full border border-gray-300 rounded-md p-2">
+                                                        <select name="place_id" className="w-full border border-gray-300 rounded-md p-2">
                                                             {places.map((place) => (
                                                                 <option key={place.id} value={place.id}>
                                                                     {place.name}
@@ -381,6 +400,7 @@ export default function MapOverlay({
                                                             <Input
                                                                 id="start_time"
                                                                 type="time"
+                                                                name="start_time"
                                                                 value={startTime}
                                                                 onChange={(e) => setStartTime(e.target.value)}
                                                                 className="h-12 rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)]"
@@ -393,6 +413,7 @@ export default function MapOverlay({
                                                             <Input
                                                                 id="end_time"
                                                                 type="time"
+                                                                name="end_time"
                                                                 value={endTime}
                                                                 onChange={(e) => setEndTime(e.target.value)}
                                                                 className="h-12 rounded-xl border-2 border-gray-200 focus:border-[var(--brand-blue)]"
@@ -487,9 +508,11 @@ export default function MapOverlay({
 
                                                         {/* Input de archivo real, pero oculto */}
                                                         <Input
+                                                            required
                                                             ref={fileInputRef}
                                                             id="image" // El 'id' coincide con el 'htmlFor' del Label
                                                             type="file"
+                                                            name="image"
                                                             accept="image/*"
                                                             onChange={handleImageChange}
                                                             className="hidden" // ¡Clave! Ocultamos el input feo
