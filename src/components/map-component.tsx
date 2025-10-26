@@ -1,48 +1,47 @@
 // Next.js MapLibre page backed by Amazon Location Service
 "use client"
 
-import { useEffect, useState } from "react"
+// --- IMPORTS DE AMBOS ARCHIVOS ---
+import { useEffect, useState, useRef } from "react" // <--- Añadido useRef
 import Map, { NavigationControl, Marker } from "react-map-gl/maplibre"
 import maplibreGl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
+// import { s } from "framer-motion/client" // <--- Import sin usar, lo quitamos
+import { motion, AnimatePresence } from "framer-motion" // <--- Añadido de MapOverlay
+import { X, MapPin } from "lucide-react" // <--- Añadido de MapOverlay
+import { Button } from "@/components/ui/button" // <--- Añadido de MapOverlay
+import Image from "next/image" // <--- Añadido para mostrar detalles
 
-// Coordenadas de ejemplo (como en el snippet HTML): Vancouver
+
+// Coordenadas de ejemplo
 const EXAMPLE_LONGITUDE = -100.2906
 const EXAMPLE_LATITUDE = 25.6514
 const MAP_REGION = process.env.NEXT_PUBLIC_AWS_REGION
 const MAP_NAME = process.env.NEXT_PUBLIC_MAP_NAME
 const API_KEY = process.env.NEXT_PUBLIC_MAP_API_KEY
 
-// Pequeña ayuda en runtime para detectar configuración faltante durante el dev
+// ... (El código de 'if (typeof window !== "undefined")' se queda igual) ...
 if (typeof window !== "undefined") {
     if (!MAP_REGION || !MAP_NAME || !API_KEY) {
-        // eslint-disable-next-line no-console
         console.warn(
             "Amazon Location: faltan variables NEXT_PUBLIC_AWS_REGION, NEXT_PUBLIC_MAP_NAME o NEXT_PUBLIC_MAP_API_KEY"
         )
     }
 }
 
-/**
- * Esta función intercepta cada petición que hace el mapa (para tiles, estilos, etc.)
- * y le añade tu API Key como un parámetro en la URL.
- */
+// ... (La función 'transformRequest' se queda igual) ...
 const transformRequest = (url: string, resourceType?: string) => {
     let newUrl = url
     if (resourceType === "Style" && !/^https?:\/\//.test(url)) {
         newUrl = `https://maps.geo.${MAP_REGION}.amazonaws.com/maps/v0/maps/${MAP_NAME}/style-descriptor`
     }
-
     if (newUrl.includes("amazonaws.com")) {
-        // Evita duplicar el parámetro key
         if (!/[?&]key=/.test(newUrl)) {
             const sep = newUrl.includes("?") ? "&" : "?"
             newUrl = `${newUrl}${sep}key=${API_KEY}`
         }
         return { url: newUrl }
     }
-
-    // No modificar otras URLs
     return { url }
 }
 
@@ -51,21 +50,14 @@ interface Place {
     name: string;
     latitude: number;
     longitude: number;
+    // Añade campos opcionales que tu API pueda devolver
+    description?: string;
+    image_url?: string;
 }
 
 export default function MapComponent() {
+    // --- Estados del Mapa (Archivo 1) ---
     const [places, setPlaces] = useState<Place[]>([]);
-
-    useEffect(() => {
-        const fetchPlaces = async () => {
-            const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getPlaces`);
-            const places = await data.json();
-            setPlaces(places);
-        };
-
-        fetchPlaces();
-    }, []);
-
     const [initialViewState, setInitialViewState] = useState({
         longitude: EXAMPLE_LONGITUDE,
         latitude: EXAMPLE_LATITUDE,
@@ -73,28 +65,46 @@ export default function MapComponent() {
     })
     const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number } | null>(null);
 
-    // NUEVO: Pedir la ubicación cuando el componente cargue
+    // --- Estados del BottomSheet (copiados de Archivo 2) ---
+    const [showPlaceSheet, setShowPlaceSheet] = useState(false)
+    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null) // <-- ¡NUEVO!
+    const [sheetHeight, setSheetHeight] = useState(50) // percentage
+    const [isDragging, setIsDragging] = useState(false)
+    const dragStartY = useRef(0)
+    const dragStartHeight = useRef(0)
+
+    // --- useEffect para Cargar Lugares (con manejo de errores) ---
+    useEffect(() => {
+        const fetchPlaces = async () => {
+            try {
+                const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getPlaces`);
+                if (!data.ok) {
+                    throw new Error(`Error al cargar lugares: ${data.status}`);
+                }
+                const placesData = await data.json();
+                setPlaces(placesData);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchPlaces();
+    }, []);
+
+    // --- useEffect para Ubicación del Usuario (sin cambios) ---
     useEffect(() => {
         if (navigator.geolocation) {
-
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    // Éxito: El usuario aceptó
                     const { latitude, longitude } = position.coords;
-
-                    // 1. Guardamos la ubicación para el Marker
                     setUserLocation({ latitude, longitude });
-
-                    // 2. (Opcional) Centramos el mapa en el usuario
                     setInitialViewState(prev => ({
                         ...prev,
                         latitude: latitude,
                         longitude: longitude,
-                        zoom: 16, // Hacemos un zoom más cercano
+                        zoom: 16,
                     }));
                 },
                 (error) => {
-                    // Error: El usuario bloqueó el permiso o hubo un fallo
                     console.error("Error al obtener la ubicación:", error.message);
                 }
             );
@@ -103,8 +113,68 @@ export default function MapComponent() {
         }
     }, []);
 
+    // --- Handlers de DRAG (copiados de Archivo 2) ---
+    const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+        setIsDragging(true)
+        const clientY = "touches" in e ? e.touches[0].clientY : e.clientY
+        dragStartY.current = clientY
+        dragStartHeight.current = sheetHeight
+    }
+
+    const handleDragMove = (e: TouchEvent | MouseEvent) => {
+        if (!isDragging) return
+        e.preventDefault();
+        const clientY = "touches" in e ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY
+        const deltaY = dragStartY.current - clientY
+        const windowHeight = window.innerHeight
+        const deltaPercent = (deltaY / windowHeight) * 100
+        const newHeight = Math.min(Math.max(dragStartHeight.current + deltaPercent, 20), 90)
+        setSheetHeight(newHeight)
+    }
+
+    const handleDragEnd = () => {
+        setIsDragging(false)
+        if (sheetHeight < 35) {
+            setShowPlaceSheet(false)
+            setSheetHeight(50)
+        } else if (sheetHeight < 65) {
+            setSheetHeight(50)
+        } else {
+            setSheetHeight(90)
+        }
+    }
+
+    // --- useEffect de DRAG (copiado de Archivo 2) ---
+    useEffect(() => {
+        if (isDragging) {
+            const handleMove = (e: TouchEvent | MouseEvent) => handleDragMove(e)
+            const handleEnd = () => handleDragEnd()
+
+            window.addEventListener("touchmove", handleMove, { passive: false })
+            window.addEventListener("mousemove", handleMove)
+            window.addEventListener("touchend", handleEnd)
+            window.addEventListener("mouseup", handleEnd)
+
+            return () => {
+                window.removeEventListener("touchmove", handleMove)
+                window.removeEventListener("mousemove", handleMove)
+                window.removeEventListener("touchend", handleEnd)
+                window.removeEventListener("mouseup", handleEnd)
+            }
+        }
+    }, [isDragging, sheetHeight])
+
+    // --- Función para CERRAR el Sheet (copiada de Archivo 2) ---
+    const closeSheet = () => {
+        setShowPlaceSheet(false)
+        setSheetHeight(50)
+        // Opcional: deseleccionar el lugar después de cerrar
+        // setTimeout(() => setSelectedPlace(null), 300); 
+    }
+
     return (
-        <div style={{ height: "100vh", width: "100%" }}>
+        //  👇 ¡IMPORTANTE! Añadido 'position: relative' y 'overflow: hidden'
+        <div style={{ height: "100vh", width: "100%", position: "relative", overflow: "hidden" }}>
             <Map
                 {...initialViewState}
                 mapLib={maplibreGl}
@@ -113,14 +183,13 @@ export default function MapComponent() {
                 onMove={(evt: any) => setInitialViewState(evt.viewState)}
                 style={{ width: "100%", height: "100%" }}
             >
-                {/* <NavigationControl position="top-left" /> */}
+                {/* --- Marcador de Usuario (sin cambios) --- */}
                 {userLocation && (
                     <Marker
                         longitude={userLocation.longitude}
                         latitude={userLocation.latitude}
-                        anchor="center" // 'center' es mejor para un punto
+                        anchor="center"
                     >
-                        {/* Este es el marcador estilo Google Maps */}
                         <div className="user-marker-container">
                             <div className="user-marker-pulse"></div>
                             <div className="user-marker-dot"></div>
@@ -128,25 +197,110 @@ export default function MapComponent() {
                     </Marker>
                 )}
 
+                {/* --- Marcadores de Lugares (onClick MODIFICADO) --- */}
                 {places.map((place) => (
                     <Marker
                         key={place.id}
                         longitude={place.longitude}
                         latitude={place.latitude}
-                        // Hacemos clic en el marcador
                         onClick={(e) => {
-                            e.originalEvent.stopPropagation(); // Evita que el clic "atraviese" al mapa
-                            console.log("Clic en:", place.name);
-                            // Aquí podrías abrir un Popup
+                            e.originalEvent.stopPropagation();
+                            setSelectedPlace(place);  // <-- ¡NUEVO! Establece el lugar
+                            setShowPlaceSheet(true); // <-- ¡NUEVO! Abre el panel
+                            setSheetHeight(50);      // <-- ¡NUEVO! Resetea la altura
                         }}
                     >
-                        {/* Este es nuestro marcador moderno con CSS */}
-                        <div className="marker-pin">
-                            <div className="marker-pulse"></div>
+                        {/* Contenedor del marcador con etiqueta */}
+                        <div className="flex flex-col items-center -translate-y-2">
+                            <span className="z-10 mb-10 max-w-[160px] truncate px-2 py-0.5 rounded bg-white text-xs font-medium shadow ring-1 ring-black/5">
+                                {place.name}
+                            </span>
+                            <div className="marker-pin">
+                                <div className="marker-pulse"></div>
+                            </div>
                         </div>
                     </Marker>
                 ))}
             </Map>
+
+            {/* --- BOTTOM SHEET (copiado de Archivo 2 y MODIFICADO) --- */}
+            <AnimatePresence>
+                {showPlaceSheet && selectedPlace && ( // <-- Condición actualizada
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            className="absolute inset-0 z-30 bg-black/30"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            onClick={closeSheet}
+                        />
+
+                        {/* Panel deslizable */}
+                        <motion.div
+                            className="absolute bottom-0 left-0 right-0 z-40"
+                            style={{
+                                height: `${sheetHeight}%`,
+                                touchAction: "none",
+                            }}
+                            initial={{ y: "100%" }}
+                            animate={{ y: "0%" }}
+                            exit={{ y: "100%" }}
+                            transition={{ type: "spring", damping: 20, stiffness: 150 }}
+                        >
+                            <div className="mx-auto h-full max-w-2xl px-4">
+                                <div className="flex h-full flex-col rounded-t-3xl bg-white shadow-2xl">
+                                    {/* Drag Handle */}
+                                    <div
+                                        className="flex cursor-grab items-center justify-center py-4 active:cursor-grabbing"
+                                        onTouchStart={handleDragStart}
+                                        onMouseDown={handleDragStart}
+                                    >
+                                        <div className="h-1.5 w-12 rounded-full bg-gray-300 transition-colors hover:bg-gray-400" />
+                                    </div>
+
+                                    {/* Contenido del Panel (MODIFICADO) */}
+                                    <div className="flex-1 overflow-y-auto px-6 pb-6">
+                                        <div className="mb-4 flex items-center justify-between">
+                                            <h2 className="text-2xl font-bold" style={{ color: "var(--brand-blue)" }}>
+                                                {selectedPlace.name}
+                                            </h2>
+                                            <button
+                                                onClick={closeSheet}
+                                                className="rounded-full p-2 transition-all hover:bg-gray-100 active:scale-95"
+                                            >
+                                                <X className="h-6 w-6 text-gray-500" />
+                                            </button>
+                                        </div>
+
+                                        {/* Aquí muestras los detalles del lugar */}
+                                        <div className="space-y-4">
+                                            {selectedPlace.image_url && (
+                                                <div className="relative w-full h-48 rounded-xl overflow-hidden">
+                                                    <Image
+                                                        src={selectedPlace.image_url}
+                                                        alt={selectedPlace.name}
+                                                        fill
+                                                        style={{ objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                            )}
+                                            <p className="text-gray-700">
+                                                {selectedPlace.description || "No hay descripción disponible para este lugar."}
+                                            </p>
+                                            {/* Puedes añadir más detalles aquí */}
+                                            <Button className="w-full" style={{ backgroundColor: "var(--brand-blue)", color: "white" }}>
+                                                Ver promociones
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
