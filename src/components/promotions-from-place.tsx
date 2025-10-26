@@ -131,7 +131,14 @@ export default function PromotionsFromPlace({
                             key={promotion.id ?? promotion.title ?? Math.random()} 
                             name={promotion.title ?? "Sin título"} 
                             image={promotion.image_url ?? ""} 
-                            votes={promotion.votes ?? 0} 
+                            votes={promotion.votes ?? 0}
+                            title={promotion.title}
+                            description={promotion.description}
+                            price={promotion.price}
+                            startTime={promotion.start_time}
+                            endTime={promotion.end_time}
+                            dayOfWeek={promotion.day_of_week}
+                            placeName={promotion.place_name}
                         />
                     ))
                 )}
@@ -151,12 +158,13 @@ export default function PromotionsFromPlace({
                     ) : (
                         products.map((product: any) => (
                             <Card 
-
-
                                 key={product.id ?? product.name ?? Math.random()}
                                 name={product.name ?? "Sin nombre"}
                                 image={product.image_url ?? ""}
                                 votes={product.votes ?? 0}
+                                title={product.name}
+                                description={product.description}
+                                price={product.price}
                             />
                         ))
                     )
@@ -173,7 +181,10 @@ export default function PromotionsFromPlace({
                             key={product.id ?? product.product_name ?? Math.random()} 
                             name={product.product_name ?? "Sin nombre"} 
                             image={product.image_url ?? ""} 
-                            votes={product.votes ?? 0} 
+                            votes={product.votes ?? 0}
+                            title={product.product_name}
+                            description={product.description}
+                            price={product.price}
                         />
                     ))
                 )}

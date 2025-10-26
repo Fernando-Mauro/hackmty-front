@@ -67,7 +67,7 @@ export function ButtonSequence({
                         <Percent size={18} />
                     </motion.button>
 
-                    <motion.button
+                    {/* <motion.button
                         type="button"
                         onClick={onOfferClick} // <-- Calls parent function
                         className={cn(
@@ -80,7 +80,7 @@ export function ButtonSequence({
                     >
                         Big Discount
                         <BanknoteArrowDown size={18} />
-                    </motion.button>
+                    </motion.button> */}
                 </motion.div>
             )}
         </AnimatePresence>

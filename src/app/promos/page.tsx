@@ -92,7 +92,19 @@ export default function Promos() {
                     featured.length > 0 && (
                         <CardSection name={"Today"}>
                             {featured.map((r, index) => (
-                                <Card name={r.place_name} image={r.image_url} votes={r.votes} key={index} />
+                                <Card 
+                                    key={index}
+                                    name={r.place_name}
+                                    image={r.image_url}
+                                    votes={r.votes}
+                                    title={r.title}
+                                    description={r.description}
+                                    price={r.price}
+                                    startTime={r.start_time}
+                                    endTime={r.end_time}
+                                    dayOfWeek={r.day_of_week}
+                                    placeName={r.place_name}
+                                />
                             ))}
                         </CardSection>
                     )
@@ -102,7 +114,19 @@ export default function Promos() {
                     top.length > 0 && (
                         <CardSection name={"Top Promotions"}>
                             {top.map((r, index) => (
-                                <Card name={r.place_name} image={r.image_url} votes={r.votes} key={index} />
+                                <Card 
+                                    key={index}
+                                    name={r.place_name}
+                                    image={r.image_url}
+                                    votes={r.votes}
+                                    title={r.title}
+                                    description={r.description}
+                                    price={r.price}
+                                    startTime={r.start_time}
+                                    endTime={r.end_time}
+                                    dayOfWeek={r.day_of_week}
+                                    placeName={r.place_name}
+                                />
                             ))}
                         </CardSection>
                     )
