@@ -92,6 +92,9 @@ export default function MapOverlay({
     const [isSearchFocused, setIsSearchFocused] = useState(false)
     const [isHiddenBadge, setIsHiddenBadge] = useState(true);
 
+    // Helper to check if navigation should be hidden
+    const shouldHideNavigation = activeTab === "meal" || activeTab === "featured" || activeTab === "profile";
+
     // --- Estados de DRAG (de Archivo 3) ---
     const [showBottomSheet, setShowBottomSheet] = useState(false)
     const [selectedOption, setSelectedOption] = useState<"promotion" | "offer" | null>(null)
@@ -221,6 +224,10 @@ export default function MapOverlay({
             setIsSubmitting(false);
         }
     };
+    
+    // Store activeTab value to avoid TypeScript narrowing issues
+    const currentTab = activeTab;
+    
     return (
         <div className="relative h-screen w-full overflow-hidden bg-gray-100">
             {/* El Mapa (child) se renderiza aquí */}
@@ -229,7 +236,7 @@ export default function MapOverlay({
             }
 
             {/* Top Overlay - Search Bar y Botón + */}
-            {activeTab !== "meal" && activeTab !== "featured" && activeTab !== "profile" && (
+            {!shouldHideNavigation && (
             <div className="absolute left-0 right-0 top-0 z-10 p-4 animate-in fade-in slide-in-from-top duration-500">
                 <div className="mx-auto flex max-w-2xl items-center gap-3">
                     {/* Search Bar */}
@@ -292,7 +299,7 @@ export default function MapOverlay({
             )}
 
             {/* Bottom Navigation */}
-            {activeTab !== "meal" && activeTab !== "featured" && activeTab !== "profile" && (
+            {!shouldHideNavigation && (
             <div className="absolute bottom-0 left-0 right-0 z-10 animate-in fade-in slide-in-from-bottom duration-500">
                 <div className="mx-auto max-w-2xl px-4 pb-safe">
                     <div className="mb-4 flex items-center justify-around rounded-3xl bg-white p-2 shadow-2xl">
@@ -325,7 +332,7 @@ export default function MapOverlay({
                             onClick={() => setActiveTab("featured")}
                             className={cn(
                                 "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
-                                activeTab === "featured"
+                                currentTab === "featured"
                                     ? "bg-[var(--brand-blue)] text-white shadow-lg"
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
@@ -337,7 +344,7 @@ export default function MapOverlay({
                             onClick={() => setActiveTab("profile")}
                             className={cn(
                                 "group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-all duration-300",
-                                activeTab === "profile"
+                                currentTab === "profile"
                                     ? "bg-[var(--brand-blue)] text-white shadow-lg"
                                     : "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
