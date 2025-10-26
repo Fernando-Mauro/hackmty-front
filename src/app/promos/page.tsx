@@ -2,22 +2,27 @@
 import Card from "@/components/card";
 import CardSection from "@/components/cardsection";
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function Promos() {
 
     const [featured, setFeatured] = useState<any[]>([]);
     const [top, setTop] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         // fetch data
         const fetchFeatured = async () => {
             try {
+                setIsLoading(true);
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getDiscountsNow`);
                 const data = await response.json();
                 setFeatured(data);
                 console.log("Featured data:", data);
             } catch (error) {
                 console.error("Error fetching featured places:", error);
+            } finally {
+                setIsLoading(false);
             }
         }
 
@@ -44,6 +49,17 @@ export default function Promos() {
 
     return (
         <div className="h-screen overflow-y-auto pb-20">
+            {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                        <Loader2 
+                            className="h-12 w-12 animate-spin mx-auto" 
+                            style={{ color: "var(--brand-blue)" }}
+                        />
+                        <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading promotions...</p>
+                    </div>
+                </div>
+            ) : (
             <div className="px-4 sm:px-6 md:px-8 py-5">
 
                 {/* Promo categories */}
@@ -105,6 +121,7 @@ export default function Promos() {
                     ))}
                 </CardSection> */}
             </div>
+            )}
         </div>
     );
 }
