@@ -56,14 +56,14 @@ export default function LoginForm() {
 
 
             if (!res.ok) {
-                throw new Error("Credenciales inválidas")
+                throw new Error("Invalid credentials")
             }
 
             let data: any = null
             try {
                 data = await res.json()
             } catch {
-                // puede venir vacío si el token está en headers
+                // may come empty if token is in headers
             }
 
             let token: string | undefined =
@@ -84,12 +84,12 @@ export default function LoginForm() {
             }
 
             if (!token) {
-                throw new Error("No se recibió token en la respuesta")
+                throw new Error("No token received in response")
             }
 
-            // Importante: las cookies solo se envían al mismo dominio.
-            // Si tu API está en el mismo dominio o subdominio, puedes ajustar 'domain' y SameSite.
-            // Para uso cross-site, SameSite=None y Secure=true son necesarios.
+            // Important: cookies are only sent to the same domain.
+            // If your API is on the same domain or subdomain, you can adjust 'domain' and SameSite.
+            // For cross-site use, SameSite=None and Secure=true are necessary.
 
             await fetch("/api/auth/set-cookie", {
                 method: "POST",
@@ -107,10 +107,10 @@ export default function LoginForm() {
             console.log("Login successful, token guardado en cookie.")
 
             router.push("/app")
-            console.log("Redirigiendo a /app")
+            console.log("Redirecting to /app")
         } catch (error) {
             console.error("Error logging in:", error)
-            setError(error instanceof Error ? error.message : "Error al iniciar sesión")
+            setError(error instanceof Error ? error.message : "Error logging in")
         } finally {
             setIsLoading(false)
         }

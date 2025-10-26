@@ -23,7 +23,7 @@ export default function FeaturedPopup({ onClose }: FeaturedPopupProps) {
                         <div className="flex items-center gap-3">
                             <div>
                                 <h2 className="text-lg font-bold text-white">Featured</h2>
-                                <p className="text-xs text-white/80">Promociones destacadas</p>
+                                <p className="text-xs text-white/80">Featured promotions</p>
                             </div>
                         </div>
                         <button 

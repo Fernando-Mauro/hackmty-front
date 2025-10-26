@@ -22,7 +22,7 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                         <div className="flex items-center gap-3">
                             <div>
                                 <h2 className="text-lg font-bold text-white">Profile</h2>
-                                <p className="text-xs text-white/80">Tu información personal</p>
+                                <p className="text-xs text-white/80">Your personal information</p>
                             </div>
                         </div>
                         <button 
@@ -54,23 +54,23 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                         <div className="px-6 -mt-12">
                             <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
                                 <div className="text-center">
-                                    <h3 className="text-2xl font-bold text-gray-800">Usuario Demo</h3>
-                                    <p className="text-sm text-gray-500">@usuario_demo</p>
+                                    <h3 className="text-2xl font-bold text-gray-800">Demo User</h3>
+                                    <p className="text-sm text-gray-500">@demo_user</p>
                                 </div>
 
                                 {/* Stats */}
                                 <div className="grid grid-cols-3 gap-4 py-4 border-y border-gray-100">
                                     <div className="text-center">
                                         <p className="text-2xl font-bold text-[var(--brand-blue)]">24</p>
-                                        <p className="text-xs text-gray-500">Promociones</p>
+                                        <p className="text-xs text-gray-500">Promotions</p>
                                     </div>
                                     <div className="text-center">
                                         <p className="text-2xl font-bold text-[var(--brand-blue)]">156</p>
-                                        <p className="text-xs text-gray-500">Puntos</p>
+                                        <p className="text-xs text-gray-500">Points</p>
                                     </div>
                                     <div className="text-center">
                                         <p className="text-2xl font-bold text-[var(--brand-blue)]">12</p>
-                                        <p className="text-xs text-gray-500">Guardados</p>
+                                        <p className="text-xs text-gray-500">Saved</p>
                                     </div>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                         <div className="px-6 py-6 space-y-3">
                             {/* Personal Info */}
                             <div className="bg-white rounded-2xl shadow-sm p-4 space-y-3">
-                                <h4 className="text-sm font-semibold text-gray-700 mb-3">Información Personal</h4>
+                                <h4 className="text-sm font-semibold text-gray-700 mb-3">Personal Information</h4>
                                 
                                 <button className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
                                     <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
@@ -88,7 +88,7 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                                     </div>
                                     <div className="flex-1 text-left">
                                         <p className="text-sm font-medium text-gray-800">Email</p>
-                                        <p className="text-xs text-gray-500">usuario@example.com</p>
+                                        <p className="text-xs text-gray-500">user@example.com</p>
                                     </div>
                                 </button>
 
@@ -97,7 +97,7 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                                         <Phone className="h-5 w-5 text-green-600" />
                                     </div>
                                     <div className="flex-1 text-left">
-                                        <p className="text-sm font-medium text-gray-800">Teléfono</p>
+                                        <p className="text-sm font-medium text-gray-800">Phone</p>
                                         <p className="text-xs text-gray-500">+52 123 456 7890</p>
                                     </div>
                                 </button>
@@ -107,7 +107,7 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                                         <MapPin className="h-5 w-5 text-orange-600" />
                                     </div>
                                     <div className="flex-1 text-left">
-                                        <p className="text-sm font-medium text-gray-800">Ubicación</p>
+                                        <p className="text-sm font-medium text-gray-800">Location</p>
                                         <p className="text-xs text-gray-500">Monterrey, NL</p>
                                     </div>
                                 </button>
@@ -120,7 +120,7 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                                         <Settings className="h-5 w-5 text-gray-600" />
                                     </div>
                                     <div className="flex-1 text-left">
-                                        <p className="text-sm font-medium text-gray-800">Configuración</p>
+                                        <p className="text-sm font-medium text-gray-800">Settings</p>
                                     </div>
                                 </button>
 
@@ -129,7 +129,7 @@ export default function ProfilePopup({ onClose }: ProfilePopupProps) {
                                         <LogOut className="h-5 w-5 text-red-600" />
                                     </div>
                                     <div className="flex-1 text-left">
-                                        <p className="text-sm font-medium text-red-600">Cerrar Sesión</p>
+                                        <p className="text-sm font-medium text-red-600">Log Out</p>
                                     </div>
                                 </button>
                             </div>

@@ -2,14 +2,14 @@
 "use client"
 
 // --- IMPORTS DE AMBOS ARCHIVOS ---
-import { useEffect, useState, useRef } from "react" // <--- Añadido useRef
+import { useEffect, useState, useRef } from "react" // <--- Added useRef
 import Map, { NavigationControl, Marker } from "react-map-gl/maplibre"
 import maplibreGl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
-import { motion, AnimatePresence } from "framer-motion" // <--- Añadido de MapOverlay
-import { X, MapPin, Star } from "lucide-react" // <--- Añadido de MapOverlay
-import { Button } from "@/components/ui/button" // <--- Añadido de MapOverlay
-import Image from "next/image" // <--- Añadido para mostrar detalles
+import { motion, AnimatePresence } from "framer-motion" // <--- Added from MapOverlay
+import { X, MapPin, Star } from "lucide-react" // <--- Added from MapOverlay
+import { Button } from "@/components/ui/button" // <--- Added from MapOverlay
+import Image from "next/image" // <--- Added to show details
 import PromotionsFromPlace from "./promotions-from-place"
 
 
@@ -50,7 +50,7 @@ interface Place {
     name: string;
     latitude: number;
     longitude: number;
-    // Añade campos opcionales que tu API pueda devolver
+    // Add optional fields that your API might return
     description?: string;
     image_url?: string;
     rating?: number | string;
@@ -69,9 +69,9 @@ export default function MapComponent() {
     const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number } | null>(null);
     const [loadingLocation, setLoadingLocation] = useState(true);
 
-    // --- Estados del BottomSheet (copiados de Archivo 2) ---
+    // --- BottomSheet states (copied from File 2) ---
     const [showPlaceSheet, setShowPlaceSheet] = useState(false)
-    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null) // <-- ¡NUEVO!
+    const [selectedPlace, setSelectedPlace] = useState<Place | null>(null) // <-- NEW!
     const [sheetHeight, setSheetHeight] = useState(50) // percentage
     const [isDragging, setIsDragging] = useState(false)
     const dragStartY = useRef(0)
@@ -98,7 +98,7 @@ export default function MapComponent() {
         fetchPlaces();
     }, []);
 
-    // --- useEffect para Ubicación del Usuario (sin cambios) ---
+    // --- useEffect for User Location (no changes) ---
     useEffect(() => {
         setLoadingLocation(true);
         if (navigator.geolocation) {
@@ -115,7 +115,7 @@ export default function MapComponent() {
                     setLoadingLocation(false);
                 },
                 (error) => {
-                    console.error("Error al obtener la ubicación:", error.message);
+                    console.error("Error getting location:", error.message);
                     setLoadingLocation(false);
                 }
             );
@@ -179,19 +179,19 @@ export default function MapComponent() {
         }
     }, [isDragging, sheetHeight])
 
-    // --- Función para CERRAR el Sheet (copiada de Archivo 2) ---
+    // --- Function to CLOSE the Sheet (copied from File 2) ---
     const closeSheet = () => {
         setShowPlaceSheet(false)
         setSheetHeight(50)
         setIsExpanded(false)
-        // Opcional: deseleccionar el lugar después de cerrar
+        // Optional: deselect place after closing
         // setTimeout(() => setSelectedPlace(null), 300); 
     }
 
     return (
-        //  👇 ¡IMPORTANTE! Añadido 'position: relative' y 'overflow: hidden'
+        //  👇 IMPORTANT! Added 'position: relative' and 'overflow: hidden'
         <div style={{ height: "100vh", width: "100%", position: "relative", overflow: "hidden" }}>
-            {/* Overlay de carga mientras se obtienen lugares o ubicación */}
+            {/* Loading overlay while getting places or location */}
             {(loadingPlaces || loadingLocation) && (
                 <div className="absolute inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
                     <div className="text-center">
@@ -201,10 +201,10 @@ export default function MapComponent() {
                             role="status"
                         >
                             <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                                Cargando...
+                                Loading...
                             </span>
                         </div>
-                        <p className="mt-4 text-gray-700">Cargando mapa…</p>
+                        <p className="mt-4 text-gray-700">Loading map…</p>
                     </div>
                 </div>
             )}
@@ -216,7 +216,7 @@ export default function MapComponent() {
                 onMove={(evt: any) => setInitialViewState(evt.viewState)}
                 style={{ width: "100%", height: "100%" }}
             >
-                {/* --- Marcador de Usuario (sin cambios) --- */}
+                {/* --- User Marker (no changes) --- */}
                 {userLocation && (
                     <Marker
                         longitude={userLocation.longitude}
@@ -256,9 +256,9 @@ export default function MapComponent() {
                 ))}
             </Map>
 
-            {/* --- BOTTOM SHEET (copiado de Archivo 2 y MODIFICADO) --- */}
+            {/* --- BOTTOM SHEET (copied from File 2 and MODIFIED) --- */}
             <AnimatePresence>
-                {showPlaceSheet && selectedPlace && ( // <-- Condición actualizada
+                {showPlaceSheet && selectedPlace && ( // <-- Updated condition
                     <>
                         {/* Backdrop */}
                         <motion.div
@@ -336,7 +336,7 @@ export default function MapComponent() {
                                                     setIsExpanded(true)
                                                 }}
                                             >
-                                                Ver promociones
+                                                View promotions
                                             </Button>
 
                                             {

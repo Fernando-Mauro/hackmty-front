@@ -34,8 +34,8 @@ const itemVariants: Variants = {
 
 export function ButtonSequence({
     isHiddenBadge,
-    onPromotionClick, // <-- Recibe la función
-    onOfferClick,     // <-- Recibe la función
+    onPromotionClick, // <-- Receives the function
+    onOfferClick,     // <-- Receives the function
 }: {
     isHiddenBadge: boolean;
     onPromotionClick: () => void;
@@ -54,7 +54,7 @@ export function ButtonSequence({
                 >
                     <motion.button
                         type="button"
-                        onClick={onPromotionClick} // <-- Llama a la función del padre
+                        onClick={onPromotionClick} // <-- Calls parent function
                         className={cn(
                             "w-auto rounded-full px-5 py-3 text-sm font-semibold",
                             "bg-[#D22E1E] text-white shadow-lg",
@@ -69,7 +69,7 @@ export function ButtonSequence({
 
                     <motion.button
                         type="button"
-                        onClick={onOfferClick} // <-- Llama a la función del padre
+                        onClick={onOfferClick} // <-- Calls parent function
                         className={cn(
                             "w-auto rounded-full px-5 py-3 text-sm font-medium",
                             "bg-[#004878] text-white shadow-md",
@@ -78,7 +78,7 @@ export function ButtonSequence({
                         )}
                         variants={itemVariants}
                     >
-                        Descuentazazo
+                        Big Discount
                         <BanknoteArrowDown size={18} />
                     </motion.button>
                 </motion.div>

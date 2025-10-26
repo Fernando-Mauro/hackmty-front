@@ -3,7 +3,7 @@
 // --- IMPORTS COMBINADOS ---
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion" // No necesitamos 'Variants' aquí
+import { motion, AnimatePresence } from "framer-motion" // We don't need 'Variants' here
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -47,8 +47,8 @@ export default function MapOverlay({
     ];
 
     const specialDayOptions = [
-        { id: 7, label: 'Todos los días' },
-        { id: 8, label: 'Fines de semana' },
+        { id: 7, label: 'Every day' },
+        { id: 8, label: 'Weekends' },
     ];
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,8 +67,8 @@ export default function MapOverlay({
 
     const handleRemoveImage = () => {
         setImagePreview(null);
-        // Reseteamos el valor del input por si el usuario
-        // quiere volver a subir la MISMA imagen
+        // Reset the input value in case the user
+        // wants to upload the SAME image again
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
@@ -103,7 +103,7 @@ export default function MapOverlay({
     const dragStartY = useRef(0)
     const dragStartHeight = useRef(0)
 
-    // --- Estados de retroalimentación de formulario ---
+    // --- Form feedback states ---
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
     const [errorMessage, setErrorMessage] = useState("")
@@ -118,12 +118,12 @@ export default function MapOverlay({
 
     const handleDragMove = (e: TouchEvent | MouseEvent) => {
         if (!isDragging) return
-        e.preventDefault(); // Evita scroll de la página
+        e.preventDefault(); // Prevents page scroll
         const clientY = "touches" in e ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY
         const deltaY = dragStartY.current - clientY
         const windowHeight = window.innerHeight
         const deltaPercent = (deltaY / windowHeight) * 100
-        const newHeight = Math.min(Math.max(dragStartHeight.current + deltaPercent, 20), 90) // Límite 20% - 90%
+        const newHeight = Math.min(Math.max(dragStartHeight.current + deltaPercent, 20), 90) // Limit 20% - 90%
         setSheetHeight(newHeight)
     }
 
@@ -168,7 +168,7 @@ export default function MapOverlay({
         setIsHiddenBadge(true); // Ocultar los botones de nuevo
     }
 
-    // --- Función para CERRAR el Sheet ---
+    // --- Function to CLOSE the Sheet ---
     const closeSheet = () => {
         setShowBottomSheet(false)
         setSheetHeight(50) // Resetear altura
@@ -204,7 +204,7 @@ export default function MapOverlay({
             // Success!
             setSubmitStatus("success");
             
-            // Reset form después de 2 segundos
+            // Reset form after 2 seconds
             setTimeout(() => {
                 setSubmitStatus("idle");
                 closeSheet();
@@ -218,7 +218,7 @@ export default function MapOverlay({
 
         } catch (error) {
             setSubmitStatus("error");
-            setErrorMessage(error instanceof Error ? error.message : "Error al publicar la promoción");
+            setErrorMessage(error instanceof Error ? error.message : "Error posting promotion");
             console.error("Error submitting form:", error);
         } finally {
             setIsSubmitting(false);
@@ -252,7 +252,7 @@ export default function MapOverlay({
                         />
                         <Input
                             type="text"
-                            placeholder="Buscar un lugar"
+                            placeholder="Search for a place"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => setIsSearchFocused(true)}
@@ -283,7 +283,7 @@ export default function MapOverlay({
                         onClick={() => setIsHiddenBadge(!isHiddenBadge)}
                     >
                         <Plus className={cn("h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-300", !isHiddenBadge && "rotate-45")} />
-                        <span className="sr-only">{"Añadir publicación"}</span>
+                        <span className="sr-only">{"Add post"}</span>
                     </Button>
 
                 </div>
@@ -320,8 +320,8 @@ export default function MapOverlay({
                             onClick={() => setActiveTab("meal")}
                             className={cn(
                                 "group relative flex flex-1 flex-col items-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-3 transition-all duration-300",
-                                // Nota: esta barra inferior no se muestra cuando activeTab === "meal",
-                                // así que este botón nunca está en estado "activo" aquí.
+                                // Note: this bottom bar is not shown when activeTab === "meal",
+                                // so this button is never in "active" state here.
                                 "text-gray-500 hover:bg-gray-50 active:scale-95",
                             )}
                         >
@@ -551,7 +551,7 @@ export default function MapOverlay({
                                                     {/* --- SELECTOR DE DÍA --- */}
                                                     <div className="space-y-1 sm:space-y-2">
                                                         <Label className="mb-1 sm:mb-2 block text-xs sm:text-sm font-medium text-gray-700">
-                                                            Días de la semana
+                                                            Days of the week
                                                         </Label>
 
                                                         {/* Los 7 botones de días */}
@@ -641,7 +641,7 @@ export default function MapOverlay({
                                                             name="image"
                                                             accept="image/*"
                                                             onChange={handleImageChange}
-                                                            className="hidden" // ¡Clave! Ocultamos el input feo
+                                                            className="hidden" // Key! Hide the ugly input
                                                         />
                                                     </div>
                                                     {/* Mensaje de estado */}
@@ -649,7 +649,7 @@ export default function MapOverlay({
                                                         <div className="flex items-center gap-2 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-green-50 border border-green-200 animate-in fade-in slide-in-from-top duration-300">
                                                             <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
                                                             <p className="text-xs sm:text-sm text-green-700 font-medium">
-                                                                ¡Promoción publicada exitosamente!
+                                                                Promotion posted successfully!
                                                             </p>
                                                         </div>
                                                     )}
@@ -659,7 +659,7 @@ export default function MapOverlay({
                                                             <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 shrink-0" />
                                                             <div className="flex-1">
                                                                 <p className="text-xs sm:text-sm text-red-700 font-medium">
-                                                                    Error al publicar
+                                                                    Error posting
                                                                 </p>
                                                                 {errorMessage && (
                                                                     <p className="text-[10px] sm:text-xs text-red-600 mt-1">
@@ -692,15 +692,15 @@ export default function MapOverlay({
                                                         {submitStatus === "error" && (
                                                             <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                                                         )}
-                                                        {isSubmitting ? "Publicando..." : 
-                                                         submitStatus === "success" ? "¡Publicado!" :
-                                                         submitStatus === "error" ? "Reintentar" :
+                                                        {isSubmitting ? "Publishing..." : 
+                                                         submitStatus === "success" ? "Published!" :
+                                                         submitStatus === "error" ? "Retry" :
                                                          "Publish"}
                                                     </Button>
                                                 </form>
                                             ) : (
                                                 <p className="mb-3 sm:mb-4 text-sm sm:text-base text-gray-600">
-                                                    {"Ofrece un descuentazo irresistible y destaca entre la competencia."}
+                                                    {"Offer an irresistible big discount and stand out from the competition."}
                                                 </p>
                                             )
                                         }
